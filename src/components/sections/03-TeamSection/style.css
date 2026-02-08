@@ -35,12 +35,10 @@
   letter-spacing: 0.08em;
   font-size: clamp(0.69rem, 2.1vw, 0.81rem);
   font-weight: 700;
-  animation: teamRise 0.5s ease-out both;
 }
 
 .team__title {
   margin: 0;
-  animation: teamRise 0.58s ease-out 0.06s both;
 }
 
 .team__leads {
@@ -57,14 +55,14 @@
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 246, 250, 0.93) 100%);
   box-shadow: 0 0.82rem 1.6rem rgba(193, 71, 109, 0.08);
   padding: clamp(0.9rem, 3.2vw, 1.28rem);
+  transition: transform 0.26s ease, box-shadow 0.26s ease, border-color 0.26s ease;
 }
 
-.team__lead {
-  animation: teamRise 0.62s ease-out both;
-}
-
-.team__lead:nth-child(2) {
-  animation-delay: 0.08s;
+.team__lead:hover,
+.team__expert:hover {
+  transform: translateY(-0.15rem);
+  border-color: rgba(216, 92, 129, 0.7);
+  box-shadow: 0 1rem 1.85rem rgba(193, 71, 109, 0.13);
 }
 
 .team__photo-frame {
@@ -130,24 +128,11 @@
   color: #7c2e49;
   font-size: clamp(1.2rem, 3.6vw, 1.55rem);
   line-height: 1.2;
-  animation: teamRise 0.65s ease-out 0.14s both;
 }
 
 .team__experts {
   display: grid;
   gap: clamp(0.72rem, 2.5vw, 1rem);
-}
-
-.team__expert {
-  animation: teamRise 0.7s ease-out both;
-}
-
-.team__expert:nth-child(2) {
-  animation-delay: 0.08s;
-}
-
-.team__expert:nth-child(3) {
-  animation-delay: 0.16s;
 }
 
 .team__experts p {
@@ -174,23 +159,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .team__kicker,
-  .team__title,
   .team__lead,
-  .team__subtitle,
   .team__expert {
-    animation: none;
-  }
-}
-
-@keyframes teamRise {
-  from {
-    opacity: 0;
-    transform: translateY(0.62rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
+    transition: none;
   }
 }

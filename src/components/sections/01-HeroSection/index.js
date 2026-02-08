@@ -32,37 +32,39 @@
     template: `
 <section class="hero section" id="hero" aria-labelledby="hero-title">
   <div class="container">
-    <div class="hero__surface">
+    <div class="hero__surface" data-reveal="zoom">
       <div class="hero__layout">
         <div class="hero__content">
-          <p class="hero__kicker">{{ hero.kicker }}</p>
+          <p class="hero__kicker" data-reveal data-reveal-delay="40">{{ hero.kicker }}</p>
 
-          <h1 class="hero__title" id="hero-title">
+          <h1 class="hero__title" id="hero-title" data-reveal data-reveal-delay="110">
             <span>{{ hero.titleHighlight }}</span>
             {{ hero.titleText }}
           </h1>
 
-          <p class="hero__text">{{ hero.description }}</p>
+          <p class="hero__text" data-reveal data-reveal-delay="180">{{ hero.description }}</p>
 
-          <ul class="hero__highlights" aria-label="Преимущества интенсива">
+          <ul class="hero__highlights" aria-label="Преимущества интенсива" data-reveal data-reveal-delay="230">
             <li
               v-for="(highlight, index) in highlights"
               :key="highlight + index"
               class="hero__highlight"
+              data-reveal="up"
+              :data-reveal-delay="260 + (index * 65)"
             >
               {{ highlight }}
             </li>
           </ul>
 
-          <div class="hero__actions">
+          <div class="hero__actions" data-reveal data-reveal-delay="320">
             <a class="btn btn--primary hero__btn" href="#pricing">{{ hero.actions.primary }}</a>
             <a class="btn btn--ghost hero__btn" href="#program">{{ hero.actions.secondary }}</a>
           </div>
 
-          <p class="hero__meta">{{ hero.meta }}</p>
+          <p class="hero__meta" data-reveal data-reveal-delay="390">{{ hero.meta }}</p>
         </div>
 
-        <aside class="hero__visual" aria-hidden="true">
+        <aside class="hero__visual" aria-hidden="true" data-reveal="right" data-reveal-delay="180">
           <div class="hero__orb hero__orb--top"></div>
           <div class="hero__orb hero__orb--bottom"></div>
           <div class="hero__glass">

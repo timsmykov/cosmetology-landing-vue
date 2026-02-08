@@ -20,16 +20,22 @@
     template: `
 <section class="team section" id="team" aria-labelledby="team-title">
   <div class="container">
-    <div class="team__surface">
-      <header class="team__header">
+    <div class="team__surface" data-reveal="zoom">
+      <header class="team__header" data-reveal data-reveal-delay="40">
         <p class="team__kicker">Экспертная команда</p>
-        <h2 class="section-title team__title" id="team-title">{{ team.title }}</h2>
+        <h2 class="section-title team__title" id="team-title" data-reveal data-reveal-delay="100">{{ team.title }}</h2>
       </header>
 
       <div class="team__leads">
-        <article class="team__lead" v-for="(lead, leadIndex) in leads" :key="lead.name + leadIndex">
+        <article
+          class="team__lead"
+          v-for="(lead, leadIndex) in leads"
+          :key="lead.name + leadIndex"
+          data-reveal
+          :data-reveal-delay="140 + (leadIndex * 90)"
+        >
           <div class="team__photo-frame">
-            <img class="team__photo" :src="lead.photo" :alt="lead.name" loading="lazy" />
+            <img class="team__photo" :src="lead.photo" :alt="lead.name" loading="lazy" data-fade-image />
           </div>
           <h3>{{ lead.name }}</h3>
           <p class="team__role">{{ lead.role }}</p>
@@ -45,10 +51,16 @@
       </div>
 
       <div class="team__experts-wrap">
-        <h3 class="team__subtitle">{{ team.expertsTitle }}</h3>
+        <h3 class="team__subtitle" data-reveal data-reveal-delay="260">{{ team.expertsTitle }}</h3>
 
         <div class="team__experts">
-          <article class="team__expert" v-for="(expert, index) in experts" :key="expert.name + index">
+          <article
+            class="team__expert"
+            v-for="(expert, index) in experts"
+            :key="expert.name + index"
+            data-reveal
+            :data-reveal-delay="300 + (index * 90)"
+          >
             <h4>{{ expert.name }}</h4>
             <p class="team__role">{{ expert.role }}</p>
             <p>{{ expert.text }}</p>

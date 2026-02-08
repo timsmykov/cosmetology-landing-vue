@@ -42,30 +42,32 @@
     template: `
 <section class="final section" id="final" aria-labelledby="final-title">
   <div class="container">
-    <div class="final__surface">
-      <div class="final__alert" role="status" aria-live="polite">
+    <div class="final__surface" data-reveal="zoom">
+      <div class="final__alert" role="status" aria-live="polite" data-reveal data-reveal-delay="40">
         <h3>{{ final.alert.title }}</h3>
         <p class="final__alert-strong">{{ final.alert.countdown }}</p>
         <p class="final__alert-strong">{{ final.alert.deadline }}</p>
         <p class="final__alert-text">{{ final.alert.text }}</p>
       </div>
 
-      <header class="final__header">
+      <header class="final__header" data-reveal data-reveal-delay="110">
         <p class="final__kicker">Финальный шаг</p>
-        <h2 class="section-title final__title" id="final-title">{{ final.title }}</h2>
-        <p class="section-text final__text">{{ final.text }}</p>
+        <h2 class="section-title final__title" id="final-title" data-reveal data-reveal-delay="170">{{ final.title }}</h2>
+        <p class="section-text final__text" data-reveal data-reveal-delay="220">{{ final.text }}</p>
       </header>
 
-      <ul class="final__tags" aria-label="Что получите на интенсиве">
-        <li v-for="(tag, index) in tags" :key="tag + index">{{ tag }}</li>
+      <ul class="final__tags" aria-label="Что получите на интенсиве" data-reveal data-reveal-delay="260">
+        <li v-for="(tag, index) in tags" :key="tag + index" data-reveal :data-reveal-delay="290 + (index * 55)">
+          {{ tag }}
+        </li>
       </ul>
 
-      <div class="final__actions">
+      <div class="final__actions" data-reveal data-reveal-delay="430">
         <a class="btn btn--primary final__btn" href="#pricing">{{ final.actions.primary }}</a>
         <a class="btn btn--ghost final__btn" href="#program">{{ final.actions.secondary }}</a>
       </div>
 
-      <p class="final__meta">{{ final.meta }}</p>
+      <p class="final__meta" data-reveal data-reveal-delay="500">{{ final.meta }}</p>
     </div>
   </div>
 </section>

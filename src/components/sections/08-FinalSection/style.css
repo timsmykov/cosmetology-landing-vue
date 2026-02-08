@@ -30,7 +30,10 @@
     linear-gradient(160deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 242, 247, 0.93) 100%);
   box-shadow: 0 0.9rem 1.7rem rgba(195, 72, 110, 0.11);
   padding: clamp(0.86rem, 3vw, 1.2rem);
-  animation: finalRise 0.52s ease-out both;
+}
+
+.final__alert.is-inview {
+  animation: finalAlertBreath 3200ms ease-in-out 780ms infinite;
 }
 
 .final__alert h3 {
@@ -72,19 +75,16 @@
   letter-spacing: 0.08em;
   font-size: clamp(0.69rem, 2.1vw, 0.82rem);
   font-weight: 700;
-  animation: finalRise 0.58s ease-out 0.06s both;
 }
 
 .final__title {
   margin: 0;
   max-width: 24ch;
-  animation: finalRise 0.62s ease-out 0.1s both;
 }
 
 .final__text {
   margin: 0;
   max-width: 58ch;
-  animation: finalRise 0.66s ease-out 0.14s both;
 }
 
 .final__tags {
@@ -94,7 +94,6 @@
   display: grid;
   gap: 0.5rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  animation: finalRise 0.7s ease-out 0.18s both;
 }
 
 .final__tags li {
@@ -113,11 +112,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  animation: finalRise 0.74s ease-out 0.22s both;
 }
 
 .final__btn {
   min-height: 2.95rem;
+}
+
+.final__actions.is-inview .final__btn.btn--primary {
+  animation: finalCtaNudge 560ms ease-out 1500ms 1 both;
 }
 
 .final__meta {
@@ -126,7 +128,6 @@
   font-weight: 700;
   font-size: clamp(0.92rem, 2.55vw, 1rem);
   line-height: 1.42;
-  animation: finalRise 0.78s ease-out 0.26s both;
 }
 
 @media (min-width: 48em) {
@@ -152,25 +153,33 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .final__alert,
-  .final__kicker,
-  .final__title,
-  .final__text,
-  .final__tags,
-  .final__actions,
-  .final__meta {
+  .final__alert.is-inview,
+  .final__actions.is-inview .final__btn.btn--primary {
     animation: none;
   }
 }
 
-@keyframes finalRise {
-  from {
-    opacity: 0;
-    transform: translateY(0.62rem);
+@keyframes finalAlertBreath {
+  0%,
+  100% {
+    box-shadow: 0 0.9rem 1.7rem rgba(195, 72, 110, 0.11);
   }
 
-  to {
-    opacity: 1;
+  50% {
+    box-shadow: 0 1rem 1.9rem rgba(195, 72, 110, 0.2);
+  }
+}
+
+@keyframes finalCtaNudge {
+  0% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-0.16rem);
+  }
+
+  100% {
     transform: translateY(0);
   }
 }

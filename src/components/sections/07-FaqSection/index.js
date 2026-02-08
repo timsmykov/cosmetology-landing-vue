@@ -51,14 +51,21 @@
     template: `
 <section class="faq section" id="faq" aria-labelledby="faq-title">
   <div class="container">
-    <div class="faq__surface">
-      <header class="faq__header">
+    <div class="faq__surface" data-reveal="zoom">
+      <header class="faq__header" data-reveal data-reveal-delay="40">
         <p class="faq__kicker">Ответы и поддержка</p>
-        <h2 class="section-title faq__title" id="faq-title">{{ faqContent.title }}</h2>
+        <h2 class="section-title faq__title" id="faq-title" data-reveal data-reveal-delay="100">{{ faqContent.title }}</h2>
       </header>
 
       <div class="faq__list">
-        <article class="faq__item" :class="{ 'faq__item--open': isOpen(index) }" v-for="(item, index) in items" :key="item.q + index">
+        <article
+          class="faq__item"
+          :class="{ 'faq__item--open': isOpen(index) }"
+          v-for="(item, index) in items"
+          :key="item.q + index"
+          data-reveal
+          :data-reveal-delay="170 + (index * 55)"
+        >
           <h3 class="faq__question-wrap">
             <button
               class="faq__question"
@@ -86,7 +93,7 @@
         </article>
       </div>
 
-      <div class="faq__cta">
+      <div class="faq__cta" data-reveal data-reveal-delay="420">
         <p>{{ faqContent.cta.text }}</p>
 
         <div class="faq__cta-actions">

@@ -35,18 +35,15 @@
   letter-spacing: 0.08em;
   font-size: clamp(0.69rem, 2.1vw, 0.82rem);
   font-weight: 700;
-  animation: formatRise 0.5s ease-out both;
 }
 
 .format__title {
   margin: 0;
-  animation: formatRise 0.58s ease-out 0.06s both;
 }
 
 .format__text {
   margin: 0;
   max-width: 60ch;
-  animation: formatRise 0.62s ease-out 0.1s both;
 }
 
 .format__grid {
@@ -63,23 +60,6 @@
   box-shadow: 0 0.82rem 1.55rem rgba(190, 69, 107, 0.08);
   padding: clamp(0.88rem, 3vw, 1.2rem);
   transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
-  animation: formatRise 0.66s ease-out both;
-}
-
-.format__item:nth-child(2) {
-  animation-delay: 0.06s;
-}
-
-.format__item:nth-child(3) {
-  animation-delay: 0.12s;
-}
-
-.format__item:nth-child(4) {
-  animation-delay: 0.18s;
-}
-
-.format__item:nth-child(5) {
-  animation-delay: 0.24s;
 }
 
 .format__item:hover {
@@ -135,26 +115,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .format__kicker,
-  .format__title,
-  .format__text,
-  .format__item {
-    animation: none;
-  }
-
   .format__item {
     transition: none;
-  }
-}
-
-@keyframes formatRise {
-  from {
-    opacity: 0;
-    transform: translateY(0.62rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

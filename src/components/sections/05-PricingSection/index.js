@@ -34,11 +34,11 @@
     template: `
 <section class="pricing section" id="pricing" aria-labelledby="pricing-title">
   <div class="container">
-    <div class="pricing__surface">
-      <header class="pricing__header">
+    <div class="pricing__surface" data-reveal="zoom">
+      <header class="pricing__header" data-reveal data-reveal-delay="40">
         <p class="pricing__kicker">Форматы участия</p>
-        <h2 class="section-title pricing__title" id="pricing-title">{{ pricing.title }}</h2>
-        <p class="section-text pricing__text">{{ pricing.text }}</p>
+        <h2 class="section-title pricing__title" id="pricing-title" data-reveal data-reveal-delay="100">{{ pricing.title }}</h2>
+        <p class="section-text pricing__text" data-reveal data-reveal-delay="160">{{ pricing.text }}</p>
       </header>
 
       <div class="pricing__grid">
@@ -47,6 +47,8 @@
           :class="{ 'pricing__card--recommended': plan.recommended }"
           v-for="(plan, index) in plans"
           :key="plan.name + index"
+          data-reveal
+          :data-reveal-delay="220 + (index * 90)"
         >
           <div class="pricing__card-head">
             <p v-if="plan.recommended" class="pricing__badge">Рекомендуем</p>
@@ -67,7 +69,7 @@
         </article>
       </div>
 
-      <div class="pricing__note" v-if="note.length">
+      <div class="pricing__note" v-if="note.length" data-reveal data-reveal-delay="420">
         <p v-for="(line, index) in note" :key="line + index">
           <strong v-if="index === 0">{{ line }}</strong>
           <em v-else-if="index === note.length - 1">{{ line }}</em>

@@ -46,26 +46,34 @@
     template: `
 <section class="program section" id="program" aria-labelledby="program-title">
   <div class="container">
-    <div class="program__surface">
-      <header class="program__header">
+    <div class="program__surface" data-reveal="zoom">
+      <header class="program__header" data-reveal data-reveal-delay="40">
         <p class="program__kicker">Путь внедрения</p>
-        <h2 class="section-title program__title" id="program-title">{{ program.title }}</h2>
-        <p class="section-text program__text">{{ program.text }}</p>
+        <h2 class="section-title program__title" id="program-title" data-reveal data-reveal-delay="100">{{ program.title }}</h2>
+        <p class="section-text program__text" data-reveal data-reveal-delay="160">{{ program.text }}</p>
       </header>
 
-      <div class="program__actions">
+      <div class="program__actions" data-reveal data-reveal-delay="220">
         <a class="btn btn--primary program__btn" href="#pricing">{{ program.actions.primary }}</a>
         <a class="btn btn--ghost program__btn" href="#pricing">{{ program.actions.secondary }}</a>
       </div>
 
       <ol class="program__steps" aria-label="Этапы программы">
-        <li v-for="(step, index) in steps" :key="step + index">{{ step }}</li>
+        <li v-for="(step, index) in steps" :key="step + index" data-reveal :data-reveal-delay="260 + (index * 55)">
+          {{ step }}
+        </li>
       </ol>
 
-      <p class="program__mobile-note">{{ program.mobileNote }}</p>
+      <p class="program__mobile-note" data-reveal data-reveal-delay="360">{{ program.mobileNote }}</p>
 
       <div class="program__list">
-        <article class="webinar" v-for="(webinar, webinarIndex) in webinars" :key="webinar.title + webinarIndex">
+        <article
+          class="webinar"
+          v-for="(webinar, webinarIndex) in webinars"
+          :key="webinar.title + webinarIndex"
+          :data-reveal="webinarIndex % 2 === 0 ? 'left' : 'right'"
+          :data-reveal-delay="80 + (webinarIndex * 40)"
+        >
           <div class="webinar__content">
             <p class="webinar__step">{{ webinar.step }}</p>
             <h3>{{ webinar.title }}</h3>
@@ -85,13 +93,13 @@
             }"
           >
             <figure class="webinar__figure" v-for="(img, imageIndex) in webinar.images" :key="webinar.title + img + imageIndex">
-              <img :src="img" :alt="webinar.title" loading="lazy" class="webinar__image" />
+              <img :src="img" :alt="webinar.title" loading="lazy" class="webinar__image" data-fade-image />
             </figure>
           </div>
         </article>
       </div>
 
-      <div class="program__cta">
+      <div class="program__cta" data-reveal data-reveal-delay="320">
         <h3>{{ program.ctaTitle }}</h3>
         <a class="btn btn--primary program__cta-btn" href="#pricing">{{ program.ctaAction }}</a>
       </div>
