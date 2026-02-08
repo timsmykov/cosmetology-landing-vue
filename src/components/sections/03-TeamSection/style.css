@@ -1,5 +1,5 @@
 .team {
-  padding-top: clamp(2.1rem, 6vw, 3.6rem);
+  padding-top: clamp(1.4rem, 4.2vw, 2.6rem);
 }
 
 .team__surface {
@@ -55,14 +55,6 @@
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 246, 250, 0.93) 100%);
   box-shadow: 0 0.82rem 1.6rem rgba(193, 71, 109, 0.08);
   padding: clamp(0.9rem, 3.2vw, 1.28rem);
-  transition: transform 0.26s ease, box-shadow 0.26s ease, border-color 0.26s ease;
-}
-
-.team__lead:hover,
-.team__expert:hover {
-  transform: translateY(-0.15rem);
-  border-color: rgba(216, 92, 129, 0.7);
-  box-shadow: 0 1rem 1.85rem rgba(193, 71, 109, 0.13);
 }
 
 .team__photo-frame {
@@ -131,21 +123,16 @@
   gap: clamp(0.72rem, 2.5vw, 1rem);
 }
 
-.team__expert-details {
-  margin: 0;
-}
-
 .team__expert-summary {
-  list-style: none;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
   cursor: pointer;
   display: grid;
   gap: 0.35rem;
   position: relative;
-  padding-right: 1.85rem;
-}
-
-.team__expert-summary::-webkit-details-marker {
-  display: none;
+  padding: 0 1.85rem 0 0;
 }
 
 .team__expert-name {
@@ -164,11 +151,14 @@
   height: 1.42rem;
   border-radius: 100vmax;
   border: 0.0625rem solid rgba(211, 88, 125, 0.45);
-  display: block;
+  display: inline-grid;
+  place-items: center;
   background: rgba(255, 255, 255, 0.9);
-  transform-origin: center center;
-  transform: rotate(0deg) translateZ(0);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transform: rotate(0deg);
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease,
+    transform 460ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .team__expert-icon::before,
@@ -185,32 +175,55 @@
 }
 
 .team__expert-icon::after {
-  transform: translate(-50%, -50%) rotate(90deg);
+  transform: translate(-50%, -50%) rotate(90deg) scaleY(1);
+  transition:
+    transform 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 320ms ease;
 }
 
-.team__expert-details[open] .team__expert-icon {
-  transform: rotate(45deg) translateZ(0);
+.team__expert--open .team__expert-icon {
   background: rgba(255, 230, 238, 0.95);
+  border-color: rgba(209, 84, 122, 0.58);
+  transform: rotate(180deg) scale(1.03);
+}
+
+.team__expert--open .team__expert-icon::before,
+.team__expert--open .team__expert-icon::after {
+  background: #a9395d;
+}
+
+.team__expert--open .team__expert-icon::after {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(90deg) scaleY(0.2);
 }
 
 .team__expert-body {
-  margin-top: 0;
-  max-height: 0;
+  height: 0;
   opacity: 0;
   overflow: hidden;
-  transform: translateY(-0.18rem);
+  transform: translateY(-0.24rem);
   transition:
-    max-height 360ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 260ms ease,
-    transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin-top 260ms ease;
+    height 680ms cubic-bezier(0.2, 0.65, 0.2, 1),
+    opacity 460ms ease,
+    transform 680ms cubic-bezier(0.2, 0.65, 0.2, 1);
+  will-change: height, opacity, transform;
 }
 
-.team__expert-details[open] .team__expert-body {
-  margin-top: 0.52rem;
-  max-height: 16rem;
+.team__expert-body--open {
+  height: var(--expert-height, 0px);
   opacity: 1;
   transform: translateY(0);
+}
+
+.team__expert--animating .team__expert-body {
+  transition: none;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.team__expert-body-inner {
+  overflow: clip;
+  padding-top: 0.52rem;
 }
 
 .team__expert-body p {
@@ -237,13 +250,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .team__lead,
-  .team__expert {
-    transition: none;
+  .team__expert-icon {
+    transition-duration: 220ms;
   }
 
-  .team__expert-icon,
+  .team__expert-icon::after {
+    transition-duration: 220ms;
+  }
+
   .team__expert-body {
-    transition: none;
+    transition-duration: 260ms;
   }
 }

@@ -20,12 +20,10 @@
     },
     mounted() {
       window.addEventListener('scroll', this.handleScroll, { passive: true });
-      document.addEventListener('click', this.handleAnchorNavigation);
       this.handleScroll();
     },
     beforeUnmount() {
       window.removeEventListener('scroll', this.handleScroll);
-      document.removeEventListener('click', this.handleAnchorNavigation);
     },
     methods: {
       handleScroll() {
@@ -37,32 +35,6 @@
           top: 0,
           behavior: 'smooth'
         });
-      },
-      handleAnchorNavigation(event) {
-        const link = event.target && event.target.closest && event.target.closest('a[href^="#"]');
-
-        if (!link) {
-          return;
-        }
-
-        const href = link.getAttribute('href') || '';
-
-        if (!href || href === '#') {
-          return;
-        }
-
-        const target = document.querySelector(href);
-
-        if (!target) {
-          return;
-        }
-
-        event.preventDefault();
-        target.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-        window.history.replaceState(null, '', href);
       }
     },
     template: `

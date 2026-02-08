@@ -1,5 +1,5 @@
 .program {
-  padding-top: clamp(2.1rem, 6vw, 3.6rem);
+  padding-top: clamp(1.4rem, 4.2vw, 2.6rem);
 }
 
 .program__surface {
@@ -65,7 +65,9 @@
   border-radius: clamp(0.86rem, 2.6vw, 1.14rem);
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.995) 0%, rgba(255, 246, 250, 0.94) 100%);
   box-shadow: 0 0.72rem 1.35rem rgba(190, 69, 107, 0.08);
-  transition: border-color 0.24s ease, box-shadow 0.24s ease;
+  transition:
+    border-color 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .program-card--open {
@@ -80,18 +82,33 @@
   background: transparent;
   text-align: left;
   cursor: pointer;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(3.9rem, 12vw, 4.85rem);
-  grid-template-areas:
-    'step thumb'
-    'date thumb'
-    'title thumb'
-    'subtitle thumb'
-    'meta thumb';
-  gap: 0.22rem clamp(0.62rem, 1.8vw, 0.86rem);
+  display: block;
   padding: clamp(0.56rem, 2.2vw, 0.76rem) clamp(0.58rem, 2.2vw, 0.82rem);
   position: relative;
-  align-items: center;
+}
+
+.program-card__preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(3.9rem, 12vw, 4.85rem);
+  gap: 0.5rem clamp(0.62rem, 1.8vw, 0.9rem);
+  align-items: stretch;
+}
+
+.program-card__content {
+  width: 100%;
+  max-width: clamp(11.2rem, 56vw, 17rem);
+  min-width: 0;
+  display: grid;
+  gap: 0.34rem;
+  align-content: center;
+  min-height: clamp(3.9rem, 12vw, 4.85rem);
+  padding: clamp(0.48rem, 1.8vw, 0.62rem) clamp(0.62rem, 2vw, 0.78rem);
+  border: 0.0625rem solid rgba(236, 173, 195, 0.7);
+  border-radius: 0.74rem;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 239, 246, 0.92) 100%);
+  box-shadow:
+    0 0.45rem 1rem rgba(190, 69, 107, 0.08),
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.85);
 }
 
 .program-card__toggle:focus-visible {
@@ -100,7 +117,6 @@
 }
 
 .program-card__step {
-  grid-area: step;
   margin: 0;
   width: max-content;
   padding: 0.24em 0.62em;
@@ -116,7 +132,6 @@
 }
 
 .program-card__date {
-  grid-area: date;
   margin: 0;
   width: max-content;
   padding: 0.24em 0.62em;
@@ -129,70 +144,19 @@
 }
 
 .program-card__title {
-  grid-area: title;
   margin: 0;
-  width: max-content;
-  max-width: calc(100% - 0.4rem);
-  padding: 0.24em 0.6em;
-  border-radius: 0.52rem;
   color: #7f2847;
-  background: linear-gradient(145deg, rgba(255, 219, 233, 0.96) 0%, rgba(255, 235, 244, 0.95) 100%);
-  border: 0.0625rem solid rgba(236, 171, 194, 0.64);
-  font-size: clamp(0.72rem, 2.1vw, 0.86rem);
+  font-size: clamp(0.78rem, 2.2vw, 0.9rem);
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.program-card__subtitle {
-  grid-area: subtitle;
-  margin: 0;
-  color: #8b3553;
-  font-size: clamp(0.72rem, 2.1vw, 0.84rem);
-  font-weight: 700;
-  line-height: 1.22;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.program-card__meta-row {
-  grid-area: meta;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  min-width: 0;
-}
-
-.program-card__teaser {
-  margin: 0;
-  color: #6f5661;
-  font-size: clamp(0.68rem, 1.95vw, 0.78rem);
-  line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-width: 0;
-}
-
-.program-card__open-hint {
-  margin: 0;
-  color: #ad4768;
-  font-size: clamp(0.66rem, 1.85vw, 0.74rem);
-  font-weight: 700;
-  line-height: 1.2;
-  margin-left: auto;
-  flex-shrink: 0;
 }
 
 .program-card__thumb {
   margin: 0;
-  grid-area: thumb;
   align-self: center;
   justify-self: center;
   width: clamp(3.9rem, 11.8vw, 4.85rem);
@@ -201,9 +165,13 @@
   border: 0.0625rem solid rgba(232, 166, 189, 0.7);
   background: #fff;
   aspect-ratio: 1;
+  box-shadow: 0 0.4rem 0.95rem rgba(195, 71, 109, 0.12);
   transform: translateY(0) scale(1);
   opacity: 1;
-  transition: transform 0.28s ease, opacity 0.24s ease, filter 0.24s ease;
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 380ms ease,
+    filter 380ms ease;
 }
 
 .program-card__thumb img {
@@ -215,7 +183,7 @@
 
 .program-card--open .program-card__thumb {
   opacity: 0;
-  transform: translateY(0.72rem) scale(0.94);
+  transform: translateY(0.66rem) scale(0.94);
   filter: blur(0.04rem);
 }
 
@@ -228,9 +196,13 @@
   border-radius: 100vmax;
   border: 0.0625rem solid rgba(211, 88, 125, 0.45);
   background: rgba(255, 255, 255, 0.95);
-  transform-origin: center center;
-  transform: rotate(0deg) translateZ(0);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  display: inline-grid;
+  place-items: center;
+  transform: rotate(0deg);
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease,
+    transform 460ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .program-card__icon::before,
@@ -247,40 +219,61 @@
 }
 
 .program-card__icon::after {
-  transform: translate(-50%, -50%) rotate(90deg);
+  transform: translate(-50%, -50%) rotate(90deg) scaleY(1);
+  transition:
+    transform 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 320ms ease;
 }
 
 .program-card--open .program-card__icon {
-  transform: rotate(45deg) translateZ(0);
   background: rgba(255, 230, 238, 0.95);
+  border-color: rgba(209, 84, 122, 0.58);
+  transform: rotate(180deg) scale(1.03);
+}
+
+.program-card--open .program-card__icon::before,
+.program-card--open .program-card__icon::after {
+  background: #a9395d;
+}
+
+.program-card--open .program-card__icon::after {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(90deg) scaleY(0.2);
 }
 
 .program-card__panel-wrap {
-  max-height: 0;
+  height: 0;
   opacity: 0;
   overflow: hidden;
-  transform: translateY(-0.18rem);
+  transform: translateY(-0.26rem);
   transition:
-    max-height 400ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 260ms ease,
-    transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+    height 700ms cubic-bezier(0.2, 0.65, 0.2, 1),
+    opacity 460ms ease,
+    transform 700ms cubic-bezier(0.2, 0.65, 0.2, 1);
+  will-change: height, opacity, transform;
 }
 
 .program-card__panel-wrap--open {
-  max-height: 40rem;
+  height: var(--panel-height, 0px);
   opacity: 1;
   transform: translateY(0);
 }
 
+.program-card--animating .program-card__panel-wrap,
+.program-card--animating .program-card__panel,
+.program-card--animating .program-card__gallery {
+  transition: none;
+}
+
 .program-card__panel {
-  overflow: hidden;
   padding: 0 clamp(0.72rem, 2.7vw, 1rem);
   display: grid;
   gap: 0.56rem;
+  transition: padding 620ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .program-card__panel-wrap--open .program-card__panel {
-  padding-top: 0.16rem;
+  padding-top: 0.24rem;
   padding-bottom: clamp(0.72rem, 2.7vw, 1rem);
 }
 
@@ -312,10 +305,21 @@
   color: #cf5e84;
 }
 
+.program-card li.is-type-empty {
+  display: none;
+}
+
 .program-card__gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.56rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.program-card--animating .program-card__gallery {
+  opacity: var(--panel-progress, 1);
+  transform: translateY(calc((1 - var(--panel-progress, 1)) * 0.42rem));
 }
 
 .program-card__figure {
@@ -346,13 +350,16 @@
   }
 
   .program-card__toggle {
-    grid-template-columns: minmax(0, 1fr) 5.35rem;
-    gap: 0.2rem 0.9rem;
     padding: 0.62rem 0.82rem;
   }
 
-  .program-card__subtitle {
-    -webkit-line-clamp: 1;
+  .program-card__preview {
+    grid-template-columns: minmax(0, 1fr) 5.35rem;
+    gap: 0.34rem 0.9rem;
+  }
+
+  .program-card__content {
+    max-width: clamp(12.6rem, 47vw, 20.5rem);
   }
 
   .program-card__thumb {
@@ -363,9 +370,18 @@
 
 @media (prefers-reduced-motion: reduce) {
   .program-card,
-  .program-card__icon,
+  .program-card__thumb,
+  .program-card__icon {
+    transition-duration: 220ms;
+  }
+
+  .program-card__icon::after {
+    transition-duration: 220ms;
+  }
+
   .program-card__panel-wrap,
-  .program-card__thumb {
-    transition: none;
+  .program-card__panel,
+  .program-card__gallery {
+    transition-duration: 260ms;
   }
 }

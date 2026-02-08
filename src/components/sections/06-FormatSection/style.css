@@ -1,5 +1,5 @@
 .format {
-  padding-top: clamp(2.1rem, 6vw, 3.6rem);
+  padding-top: clamp(1.4rem, 4.2vw, 2.6rem);
 }
 
 .format__surface {
@@ -59,13 +59,6 @@
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 246, 250, 0.93) 100%);
   box-shadow: 0 0.82rem 1.55rem rgba(190, 69, 107, 0.08);
   padding: clamp(0.88rem, 3vw, 1.2rem);
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
-}
-
-.format__item:hover {
-  transform: translateY(-0.16rem);
-  border-color: rgba(214, 89, 127, 0.72);
-  box-shadow: 0 1rem 1.8rem rgba(190, 69, 107, 0.13);
 }
 
 .format__index {

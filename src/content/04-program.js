@@ -1,6 +1,7 @@
 (function registerProgramContent() {
   window.Landing = window.Landing || {};
   window.Landing.content = window.Landing.content || {};
+  const asset = (path) => new URL(path, import.meta.url).href;
 
   window.Landing.content.program = {
     title: 'Программа: путь трансформации',
@@ -22,7 +23,7 @@
     webinars: [
       {
         step: 'Шаг 1 из 6',
-        title: 'Вебинар 1. Введение и базовые ИИ-инструменты',
+        title: 'Вебинар 1. Введение в ИИ',
         date: '10 марта, 19:00 (МСК)',
         subtitle: 'Первый контент без стресса: фото + 3 поста за один вечер',
         text: 'На вебинаре мы за 5 минут превратим обычный кадр с телефона в аккуратную картинку, а идею — в готовый текст для поста.',
@@ -32,8 +33,8 @@
           'Писать посты без усилий: простые инструкции для готовых текстов.'
         ],
         images: [
-          './src/assets/images/webinar-1/ioHu1Z0UhgWXdrzIp6MtF.png',
-          './src/assets/images/webinar-1/uo5I7e0eecGukfaBBxUkm.png'
+          asset('../assets/images/webinar-1/ioHu1Z0UhgWXdrzIp6MtF.png'),
+          asset('../assets/images/webinar-1/uo5I7e0eecGukfaBBxUkm.png')
         ]
       },
       {
@@ -47,7 +48,7 @@
           'Формировать стратегии и проводить исследования.',
           'Строить серии контента на недели вперёд.'
         ],
-        images: ['./src/assets/images/webinar-2/ucPvVDe_k8UR7-XjFZqHg.png']
+        images: [asset('../assets/images/webinar-2/ucPvVDe_k8UR7-XjFZqHg.png')]
       },
       {
         step: 'Шаг 3 из 6',
@@ -61,9 +62,9 @@
           'Профессионально работать со светом, тенями и реалистичностью.'
         ],
         images: [
-          './src/assets/images/webinar-3/8e9NW0WgGu3oc_EMboJPn.png',
-          './src/assets/images/webinar-3/VFcSpHvN-HF7fXEI2wTSh.png',
-          './src/assets/images/webinar-3/0cHMXiYWe39ESGlZgDXou.png'
+          asset('../assets/images/webinar-3/8e9NW0WgGu3oc_EMboJPn.png'),
+          asset('../assets/images/webinar-3/VFcSpHvN-HF7fXEI2wTSh.png'),
+          asset('../assets/images/webinar-3/0cHMXiYWe39ESGlZgDXou.png')
         ]
       },
       {
@@ -77,7 +78,7 @@
           'Генерировать видео по текстовому описанию.',
           'Вставлять музыку, эффекты и субтитры автоматически.'
         ],
-        images: ['./src/assets/images/webinar-4/_g1o8DglZ08SX689x_Th2.png']
+        images: [asset('../assets/images/webinar-4/_g1o8DglZ08SX689x_Th2.png')]
       },
       {
         step: 'Шаг 5 из 6',
@@ -90,7 +91,7 @@
           'Превращать тексты в живые видео с вашим голосом.',
           'Масштабировать контент без постоянных съёмок.'
         ],
-        images: ['./src/assets/images/webinar-5/ai-in-instagram-intensive.png']
+        images: [asset('../assets/images/webinar-5/ai-in-instagram-intensive.png')]
       },
       {
         step: 'Шаг 6 из 6',
@@ -103,7 +104,7 @@
           'Использовать скрипты и ответы в Direct с помощью ИИ.',
           'Вести учёт и аналитику: лиды, конверсия, улучшение результата.'
         ],
-        images: ['./src/assets/images/webinar-6/hSiTlNXQf5UEzbMqBYPDV.png']
+        images: [asset('../assets/images/webinar-6/hSiTlNXQf5UEzbMqBYPDV.png')]
       }
     ]
   };
