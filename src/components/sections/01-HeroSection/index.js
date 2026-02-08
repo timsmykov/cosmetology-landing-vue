@@ -22,7 +22,19 @@
         }
       };
       const defaultHighlights = ['6 вебинаров', 'Пошаговое внедрение', 'Фокус на косметологии'];
-      const highlights = Array.isArray(hero.highlights) && hero.highlights.length ? hero.highlights : defaultHighlights;
+      const sourceHighlights =
+        Array.isArray(hero.highlights) && hero.highlights.length ? hero.highlights : defaultHighlights;
+      const highlights = sourceHighlights.slice();
+      const hasPhoneMention = highlights.some((item) => /телефон|с телефона/i.test(item));
+      const focusIndex = highlights.findIndex((item) => /фокус на косметологии/i.test(item));
+
+      if (!hasPhoneMention) {
+        if (focusIndex >= 0) {
+          highlights.splice(focusIndex + 1, 0, 'С телефона');
+        } else {
+          highlights.push('С телефона');
+        }
+      }
 
       return {
         hero,
@@ -56,24 +68,23 @@
             </li>
           </ul>
 
+          <div class="hero__aux" data-reveal data-reveal-delay="290">
+            <p class="hero__aux-label">AI + Instagram</p>
+            <p class="hero__aux-title">Система для косметолога</p>
+            <p class="hero__aux-text">Контент, прогрев и заявки по понятному алгоритму.</p>
+          </div>
+
           <div class="hero__actions" data-reveal data-reveal-delay="320">
             <a class="btn btn--primary hero__btn" href="#pricing">{{ hero.actions.primary }}</a>
             <a class="btn btn--ghost hero__btn" href="#program">{{ hero.actions.secondary }}</a>
           </div>
 
-          <p class="hero__meta" data-reveal data-reveal-delay="390">{{ hero.meta }}</p>
+          <p v-if="hero.meta" class="hero__meta" data-reveal data-reveal-delay="390">{{ hero.meta }}</p>
         </div>
-
-        <aside class="hero__visual" aria-hidden="true" data-reveal="right" data-reveal-delay="180">
-          <div class="hero__orb hero__orb--top"></div>
-          <div class="hero__orb hero__orb--bottom"></div>
-          <div class="hero__glass">
-            <p class="hero__glass-label">AI + Instagram</p>
-            <p class="hero__glass-title">Система для косметолога</p>
-            <p class="hero__glass-text">Контент, прогрев и заявки по понятному алгоритму.</p>
-          </div>
-        </aside>
       </div>
+
+      <div class="hero__orb hero__orb--top" aria-hidden="true"></div>
+      <div class="hero__orb hero__orb--bottom" aria-hidden="true"></div>
     </div>
   </div>
 </section>

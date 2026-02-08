@@ -22,6 +22,10 @@ body {
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   color: var(--text);
@@ -50,7 +54,7 @@ button:focus-visible {
 }
 
 .section {
-  padding: 72px 0;
+  padding: 40px 0;
 }
 
 .section-title {
@@ -98,12 +102,67 @@ button:focus-visible {
   background: #fff;
 }
 
+.scroll-top {
+  position: fixed;
+  right: clamp(0.8rem, 2.8vw, 1.35rem);
+  bottom: clamp(0.8rem, 3vw, 1.45rem);
+  width: clamp(2.4rem, 9vw, 3rem);
+  height: clamp(2.4rem, 9vw, 3rem);
+  display: inline-grid;
+  place-items: center;
+  border: 0.0625rem solid rgba(205, 76, 113, 0.4);
+  border-radius: 100vmax;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 235, 242, 0.92) 100%);
+  color: #a7385c;
+  font-size: clamp(1rem, 3.8vw, 1.2rem);
+  line-height: 1;
+  box-shadow: 0 0.7rem 1.4rem rgba(197, 71, 110, 0.14);
+  cursor: pointer;
+  z-index: 70;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  pointer-events: none;
+  transition:
+    opacity 0.24s ease,
+    transform 0.24s ease,
+    box-shadow 0.24s ease,
+    border-color 0.24s ease;
+}
+
+.scroll-top--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.scroll-top:hover {
+  border-color: rgba(199, 58, 91, 0.58);
+  box-shadow: 0 0.9rem 1.7rem rgba(197, 71, 110, 0.2);
+}
+
+.scroll-top:focus-visible {
+  outline: 0.125rem solid #b74568;
+  outline-offset: 0.125rem;
+}
+
 @media (max-width: 768px) {
   .section {
-    padding: 56px 0;
+    padding: 30px 0;
   }
 
   .btn {
     width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-top {
+    transition: none;
   }
 }

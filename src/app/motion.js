@@ -7,7 +7,7 @@
     const numeric = Number(value);
 
     if (Number.isFinite(numeric)) {
-      return `${Math.max(0, numeric)}ms`;
+      return `${Math.min(280, Math.max(0, numeric))}ms`;
     }
 
     return value;
@@ -123,6 +123,8 @@
 
     const revealVisibleNow = () => {
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+      const topBoundary = viewportHeight * 1.22;
+      const bottomBoundary = -viewportHeight * 0.2;
 
       revealItems.forEach((item) => {
         if (item.classList.contains('is-inview')) {
@@ -130,7 +132,7 @@
         }
 
         const rect = item.getBoundingClientRect();
-        const isVisibleEnough = rect.top < viewportHeight * 0.96 && rect.bottom > 0;
+        const isVisibleEnough = rect.top <= topBoundary && rect.bottom >= bottomBoundary;
 
         if (isVisibleEnough) {
           item.classList.add('is-inview');
@@ -157,8 +159,8 @@
       },
       {
         root: null,
-        threshold: 0.06,
-        rootMargin: '0px 0px -4% 0px'
+        threshold: 0.01,
+        rootMargin: '18% 0px 18% 0px'
       }
     );
 
@@ -180,9 +182,55 @@
       });
     };
 
+    const scheduleVisibleChecks = () => {
+      requestVisibleCheck();
+      [120, 280, 520].forEach((delay) => {
+        window.setTimeout(requestVisibleCheck, delay);
+      });
+    };
+
+    const revealFallback = () => {
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+
+      revealItems.forEach((item) => {
+        if (item.classList.contains('is-inview')) {
+          return;
+        }
+
+        const rect = item.getBoundingClientRect();
+        const shouldReveal = rect.top <= viewportHeight * 1.65;
+
+        if (shouldReveal) {
+          item.classList.add('is-inview');
+        }
+      });
+    };
+
+    const handleAnchorClick = (event) => {
+      const trigger = event.target && event.target.closest && event.target.closest('a[href^="#"]');
+
+      if (!trigger) {
+        return;
+      }
+
+      const href = trigger.getAttribute('href') || '';
+
+      if (!href || href === '#') {
+        return;
+      }
+
+      window.requestAnimationFrame(scheduleVisibleChecks);
+    };
+
     revealVisibleNow();
     window.addEventListener('scroll', requestVisibleCheck, { passive: true });
     window.addEventListener('resize', requestVisibleCheck, { passive: true });
+    window.addEventListener('hashchange', scheduleVisibleChecks);
+    window.addEventListener('pageshow', scheduleVisibleChecks);
+    document.addEventListener('click', handleAnchorClick);
+    window.setTimeout(scheduleVisibleChecks, 420);
+    window.setTimeout(scheduleVisibleChecks, 980);
+    window.setTimeout(revealFallback, 1800);
 
     initFadeImages();
     initHeroParallax();

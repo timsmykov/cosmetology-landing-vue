@@ -13,7 +13,6 @@
         },
         title: '',
         text: '',
-        tags: [],
         actions: {
           primary: '',
           secondary: ''
@@ -35,8 +34,7 @@
       };
 
       return {
-        final,
-        tags: Array.isArray(final.tags) ? final.tags : []
+        final
       };
     },
     template: `
@@ -56,18 +54,12 @@
         <p class="section-text final__text" data-reveal data-reveal-delay="220">{{ final.text }}</p>
       </header>
 
-      <ul class="final__tags" aria-label="Что получите на интенсиве" data-reveal data-reveal-delay="260">
-        <li v-for="(tag, index) in tags" :key="tag + index" data-reveal :data-reveal-delay="290 + (index * 55)">
-          {{ tag }}
-        </li>
-      </ul>
-
-      <div class="final__actions" data-reveal data-reveal-delay="430">
+      <div class="final__actions" data-reveal data-reveal-delay="300">
         <a class="btn btn--primary final__btn" href="#pricing">{{ final.actions.primary }}</a>
         <a class="btn btn--ghost final__btn" href="#program">{{ final.actions.secondary }}</a>
       </div>
 
-      <p class="final__meta" data-reveal data-reveal-delay="500">{{ final.meta }}</p>
+      <p v-if="final.meta" class="final__meta" data-reveal data-reveal-delay="500">{{ final.meta }}</p>
     </div>
   </div>
 </section>

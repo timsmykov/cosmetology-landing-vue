@@ -22,7 +22,7 @@
   <div class="container">
     <div class="team__surface" data-reveal="zoom">
       <header class="team__header" data-reveal data-reveal-delay="40">
-        <p class="team__kicker">Экспертная команда</p>
+        <p class="team__kicker">Кто вас ведёт</p>
         <h2 class="section-title team__title" id="team-title" data-reveal data-reveal-delay="100">{{ team.title }}</h2>
       </header>
 
@@ -61,9 +61,17 @@
             data-reveal
             :data-reveal-delay="300 + (index * 90)"
           >
-            <h4>{{ expert.name }}</h4>
-            <p class="team__role">{{ expert.role }}</p>
-            <p>{{ expert.text }}</p>
+            <details class="team__expert-details" :open="index === 0">
+              <summary class="team__expert-summary">
+                <span class="team__expert-name">{{ expert.name }}</span>
+                <span class="team__role">{{ expert.role }}</span>
+                <span class="team__expert-icon" aria-hidden="true"></span>
+              </summary>
+
+              <div class="team__expert-body">
+                <p>{{ expert.text }}</p>
+              </div>
+            </details>
           </article>
         </div>
       </div>
