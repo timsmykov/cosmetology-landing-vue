@@ -10,6 +10,7 @@
         text: '',
         actions: {
           primary: '',
+          primaryUrl: '#pricing',
           secondary: ''
         },
         steps: [],
@@ -18,6 +19,7 @@
         ...source,
         actions: {
           primary: '',
+          primaryUrl: '#pricing',
           secondary: '',
           ...(source.actions || {})
         }
@@ -47,34 +49,29 @@
 
       return {
         activeWebinarIndex: -1,
-        closingWebinarIndex: -1,
         animatingWebinarIndex: -1,
         isSwitching: false,
         program,
         webinars,
         panelRefs: {},
-        panelHeights: {}
+        panelHeights: {},
+        resizeFrameId: 0
       };
     },
     mounted() {
       window.addEventListener('resize', this.handleResize, { passive: true });
       this.$nextTick(() => {
-        this.initializeTyping();
         this.updateAllPanelHeights();
       });
     },
     beforeUnmount() {
       window.removeEventListener('resize', this.handleResize);
+      if (this.resizeFrameId) {
+        window.cancelAnimationFrame(this.resizeFrameId);
+        this.resizeFrameId = 0;
+      }
     },
     methods: {
-      nextTickAsync() {
-        return new Promise((resolve) => {
-          this.$nextTick(resolve);
-        });
-      },
-      getTypingApi() {
-        return window.Landing && window.Landing.typing;
-      },
       getPanelContent(index) {
         const panelWrap = this.panelRefs[index];
 
@@ -87,43 +84,34 @@
       getPanelWrap(index) {
         return this.panelRefs[index] || null;
       },
-      setPanelAnimationVars(index, payload = {}) {
+      getCardElement(index) {
         const panelWrap = this.getPanelWrap(index);
 
-        if (!panelWrap) {
-          return;
+        if (!panelWrap || !panelWrap.closest) {
+          return null;
         }
 
-        if (Number.isFinite(payload.height)) {
-          panelWrap.style.setProperty('--panel-height', `${Math.max(0, Math.ceil(payload.height))}px`);
-        }
-
-        if (Number.isFinite(payload.progress)) {
-          panelWrap.style.setProperty(
-            '--panel-progress',
-            String(Math.max(0, Math.min(1, payload.progress)))
-          );
-        }
+        return panelWrap.closest('.program-card');
       },
-      initializeTyping() {
-        const typing = this.getTypingApi();
+      setPanelHeight(index, height) {
+        const panelWrap = this.getPanelWrap(index);
+        const normalized = `${Math.max(0, Math.ceil(height || 0))}px`;
 
-        if (!typing) {
-          return;
+        this.panelHeights[index] = normalized;
+
+        if (panelWrap) {
+          panelWrap.style.setProperty('--panel-height', normalized);
         }
-
-        this.webinars.forEach((_, index) => {
-          const panel = this.getPanelContent(index);
-
-          if (!panel) {
-            return;
-          }
-
-          typing.setProgress(panel, 0);
-        });
       },
       handleResize() {
-        this.updateAllPanelHeights();
+        if (this.resizeFrameId) {
+          window.cancelAnimationFrame(this.resizeFrameId);
+        }
+
+        this.resizeFrameId = window.requestAnimationFrame(() => {
+          this.resizeFrameId = 0;
+          this.updateAllPanelHeights();
+        });
       },
       setPanelRef(index, el) {
         if (!el) {
@@ -149,6 +137,10 @@
           }
 
           const recalc = () => {
+            if (this.animatingWebinarIndex === index) {
+              return;
+            }
+
             this.updatePanelHeight(index);
           };
 
@@ -158,89 +150,157 @@
 
         panelWrap.dataset.panelMediaBound = 'true';
       },
-      updatePanelHeight(index, options = {}) {
-        const panel = this.getPanelContent(index);
-
-        if (!panel) {
-          return;
-        }
-
-        const typing = this.getTypingApi();
-        const useCurrent = Boolean(options.useCurrent);
-        const measured = useCurrent || !typing
-          ? Math.ceil(panel.scrollHeight + 1)
-          : typing.measureHeight(panel, () => Math.ceil(panel.scrollHeight + 1));
-
-        this.panelHeights[index] = `${measured}px`;
-      },
-      updateAllPanelHeights() {
-        this.webinars.forEach((_, index) => {
-          this.updatePanelHeight(index);
-        });
-      },
-      getFullPanelHeight(index) {
+      measurePanelHeight(index) {
         const panel = this.getPanelContent(index);
 
         if (!panel) {
           return 0;
         }
 
-        const typing = this.getTypingApi();
-        const measured = typing
-          ? typing.measureHeight(panel, () => Math.ceil(panel.scrollHeight + 1))
-          : Math.ceil(panel.scrollHeight + 1);
+        const measured = Math.max(0, Math.ceil(panel.scrollHeight + 1));
 
-        return Math.max(0, measured);
+        return measured;
+      },
+      updatePanelHeight(index) {
+        const measured = this.measurePanelHeight(index);
+
+        this.setPanelHeight(index, measured);
+      },
+      updateAllPanelHeights() {
+        this.webinars.forEach((_, index) => {
+          this.updatePanelHeight(index);
+        });
       },
       getPanelStyle(index) {
         return {
           '--panel-height': this.panelHeights[index] || '0px'
         };
       },
-      async playTyping(index, direction, options = {}) {
-        const typing = this.getTypingApi();
-        const panel = this.getPanelContent(index);
+      waitForPanelTransition(index, timeoutMs = 560) {
+        const panelWrap = this.getPanelWrap(index);
 
-        if (!typing || !panel) {
+        if (!panelWrap) {
+          return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+          let finished = false;
+          let timeoutId = 0;
+
+          const done = () => {
+            if (finished) {
+              return;
+            }
+
+            finished = true;
+            panelWrap.removeEventListener('transitionend', handleTransitionEnd);
+            window.clearTimeout(timeoutId);
+            resolve();
+          };
+
+          const handleTransitionEnd = (event) => {
+            if (event.target !== panelWrap || event.propertyName !== 'height') {
+              return;
+            }
+
+            done();
+          };
+
+          panelWrap.addEventListener('transitionend', handleTransitionEnd);
+          timeoutId = window.setTimeout(done, timeoutMs);
+        });
+      },
+      getPanelHeightValue(index) {
+        const raw = this.panelHeights[index] || '0';
+        const numeric = Number.parseFloat(raw);
+        return Number.isFinite(numeric) ? numeric : 0;
+      },
+      ensurePanelHeight(index) {
+        if (this.getPanelHeightValue(index) > 0) {
           return;
         }
 
-        const collapseWithPanel = Boolean(options.collapseWithPanel);
-        const fullHeight = collapseWithPanel ? this.getFullPanelHeight(index) : 0;
+        this.updatePanelHeight(index);
+      },
+      focusCardInViewport(index, options = {}) {
+        const card = this.getCardElement(index);
+        const panelWrap = this.getPanelWrap(index);
 
-        if (direction === 'forward') {
-          typing.setProgress(panel, 0);
-          this.panelHeights[index] = '0px';
-          await this.nextTickAsync();
-          this.setPanelAnimationVars(index, { height: 0, progress: 0 });
+        if (!card || !panelWrap) {
+          return;
         }
 
-        const animateOptions = {
-          duration: Number.isFinite(options.duration) ? options.duration : 420
-        };
+        const rect = card.getBoundingClientRect();
+        const currentPanelHeight = Math.max(0, Math.round(panelWrap.getBoundingClientRect().height));
+        const targetPanelHeight = Number.isFinite(options.targetPanelHeight)
+          ? Math.max(0, Math.round(options.targetPanelHeight))
+          : currentPanelHeight;
+        const predictedCardHeight = Math.max(
+          0,
+          Math.round(rect.height - currentPanelHeight + targetPanelHeight)
+        );
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+        const currentTop = window.scrollY || window.pageYOffset || 0;
+        const topPadding = Math.max(14, Math.round(viewportHeight * 0.08));
+        const bottomPadding = Math.max(14, Math.round(viewportHeight * 0.1));
+        const fitsViewport = predictedCardHeight + topPadding + bottomPadding <= viewportHeight;
+        let targetTop = currentTop;
 
-        if (Array.isArray(options.progressWindow) && options.progressWindow.length === 2) {
-          animateOptions.progressWindow = options.progressWindow;
+        if (fitsViewport) {
+          const centeredTop = (viewportHeight - predictedCardHeight) / 2;
+          targetTop = currentTop + rect.top - centeredTop;
+        } else {
+          const preferredTop = topPadding;
+          const preferredBottom = viewportHeight - bottomPadding;
+          const predictedBottom = rect.top + predictedCardHeight;
+          const needsAdjustment = rect.top < preferredTop || predictedBottom > preferredBottom;
+
+          if (!needsAdjustment) {
+            return;
+          }
+
+          targetTop = currentTop + rect.top - preferredTop;
         }
 
-        if (collapseWithPanel) {
-          animateOptions.onUpdate = (progress) => {
-            const nextHeight = Math.ceil(fullHeight * Math.max(0, Math.min(1, progress)));
-            this.setPanelAnimationVars(index, {
-              height: nextHeight,
-              progress
-            });
-          };
+        targetTop = Math.max(0, Math.round(targetTop));
+
+        if (Math.abs(targetTop - currentTop) < 6) {
+          return;
         }
 
-        await typing.animate(panel, direction, animateOptions);
-
-        const finalProgress = direction === 'forward' ? 1 : 0;
-        this.setPanelAnimationVars(index, {
-          height: fullHeight * finalProgress,
-          progress: finalProgress
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({
+          top: targetTop,
+          behavior: reducedMotion ? 'auto' : (options.behavior || 'smooth')
         });
-        this.panelHeights[index] = `${Math.ceil(fullHeight * finalProgress)}px`;
+      },
+      async closePanel(index) {
+        if (index < 0) {
+          return;
+        }
+
+        const transitionPromise = this.waitForPanelTransition(index);
+        this.animatingWebinarIndex = index;
+        this.activeWebinarIndex = -1;
+        await transitionPromise;
+        this.animatingWebinarIndex = -1;
+      },
+      async openPanel(index) {
+        if (index < 0) {
+          return;
+        }
+
+        this.ensurePanelHeight(index);
+        const targetPanelHeight = this.getPanelHeightValue(index);
+        const transitionPromise = this.waitForPanelTransition(index);
+        this.animatingWebinarIndex = index;
+        this.activeWebinarIndex = index;
+        this.focusCardInViewport(index, {
+          behavior: 'smooth',
+          targetPanelHeight
+        });
+        await transitionPromise;
+        this.animatingWebinarIndex = -1;
       },
       async toggleWebinar(index) {
         if (this.isSwitching) {
@@ -250,42 +310,22 @@
         this.isSwitching = true;
 
         try {
-          const duration = 420;
           const current = this.activeWebinarIndex;
           const closeOnly = current === index;
 
           if (current >= 0) {
-            this.closingWebinarIndex = current;
-            this.animatingWebinarIndex = current;
-            this.panelHeights[current] = `${this.getFullPanelHeight(current)}px`;
-            await this.playTyping(current, 'reverse', {
-              collapseWithPanel: true,
-              duration,
-              progressWindow: [0.34, 0.98]
-            });
-            this.activeWebinarIndex = -1;
-            this.closingWebinarIndex = -1;
-            this.animatingWebinarIndex = -1;
-            await this.nextTickAsync();
+            await this.closePanel(current);
           }
 
           if (!closeOnly) {
-            this.activeWebinarIndex = index;
-            this.animatingWebinarIndex = index;
-            await this.nextTickAsync();
-            await this.playTyping(index, 'forward', {
-              collapseWithPanel: true,
-              duration,
-              progressWindow: [0.34, 0.98]
-            });
-            this.animatingWebinarIndex = -1;
+            await this.openPanel(index);
           }
         } finally {
           this.isSwitching = false;
         }
       },
       isWebinarOpen(index) {
-        return this.activeWebinarIndex === index || this.closingWebinarIndex === index;
+        return this.activeWebinarIndex === index;
       },
       getWebinarButtonId(index) {
         return `program-webinar-button-${index}`;
@@ -308,7 +348,14 @@
       </header>
 
       <div class="program__actions" data-reveal data-reveal-delay="220">
-        <a class="btn btn--primary program__btn" href="#pricing">{{ program.actions.primary }}</a>
+        <a
+          class="btn btn--primary program__btn"
+          :href="program.actions.primaryUrl"
+          :target="program.actions.primaryUrl && program.actions.primaryUrl.indexOf('http') === 0 ? '_blank' : null"
+          :rel="program.actions.primaryUrl && program.actions.primaryUrl.indexOf('http') === 0 ? 'noopener noreferrer' : null"
+        >
+          {{ program.actions.primary }}
+        </a>
         <a class="btn btn--ghost program__btn" href="#pricing">{{ program.actions.secondary }}</a>
       </div>
 
@@ -360,10 +407,10 @@
             :aria-hidden="isWebinarOpen(webinarIndex) ? 'false' : 'true'"
           >
             <div class="program-card__panel">
-              <p class="program-card__text" data-type-text>{{ webinar.text }}</p>
-              <h4 data-type-text>Чему вы научитесь:</h4>
+              <p class="program-card__text">{{ webinar.text }}</p>
+              <h4>Чему вы научитесь:</h4>
               <ul>
-                <li v-for="(item, itemIndex) in webinar.learn" :key="webinar.title + item + itemIndex" data-type-text>{{ item }}</li>
+                <li v-for="(item, itemIndex) in webinar.learn" :key="webinar.title + item + itemIndex">{{ item }}</li>
               </ul>
 
               <div class="program-card__gallery">

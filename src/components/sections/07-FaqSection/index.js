@@ -10,12 +10,14 @@
         cta: {
           text: '',
           supportAction: '',
+          supportUrl: '',
           buyAction: ''
         },
         ...source,
         cta: {
           text: '',
           supportAction: '',
+          supportUrl: '',
           buyAction: '',
           ...((source && source.cta) || {})
         }
@@ -53,6 +55,11 @@
       nextTickAsync() {
         return new Promise((resolve) => {
           this.$nextTick(resolve);
+        });
+      },
+      nextFrameAsync() {
+        return new Promise((resolve) => {
+          window.requestAnimationFrame(() => resolve());
         });
       },
       getTypingApi() {
@@ -158,12 +165,24 @@
 
         const collapseWithPanel = Boolean(options.collapseWithPanel);
         const fullHeight = collapseWithPanel ? this.getFullAnswerHeight(index) : 0;
+        const normalizedFullHeight = Math.ceil(Math.max(0, fullHeight));
 
         if (direction === 'forward') {
           typing.setProgress(answerInner, 0);
-          this.answerHeights[index] = '0px';
-          await this.nextTickAsync();
           this.setAnswerAnimationVars(index, { height: 0 });
+        } else if (collapseWithPanel) {
+          this.answerHeights[index] = `${normalizedFullHeight}px`;
+          this.setAnswerAnimationVars(index, { height: normalizedFullHeight });
+          await this.nextFrameAsync();
+          this.answerHeights[index] = '0px';
+          this.setAnswerAnimationVars(index, { height: 0 });
+        }
+
+        if (collapseWithPanel && direction === 'forward') {
+          this.answerHeights[index] = '0px';
+          await this.nextFrameAsync();
+          this.answerHeights[index] = `${normalizedFullHeight}px`;
+          this.setAnswerAnimationVars(index, { height: normalizedFullHeight });
         }
 
         const animateOptions = {
@@ -174,17 +193,10 @@
           animateOptions.progressWindow = options.progressWindow;
         }
 
-        if (collapseWithPanel) {
-          animateOptions.onUpdate = (progress) => {
-            const nextHeight = Math.ceil(fullHeight * Math.max(0, Math.min(1, progress)));
-            this.setAnswerAnimationVars(index, { height: nextHeight });
-          };
-        }
-
         await typing.animate(answerInner, direction, animateOptions);
         const finalProgress = direction === 'forward' ? 1 : 0;
-        this.setAnswerAnimationVars(index, { height: fullHeight * finalProgress });
-        this.answerHeights[index] = `${Math.ceil(fullHeight * finalProgress)}px`;
+        this.setAnswerAnimationVars(index, { height: normalizedFullHeight * finalProgress });
+        this.answerHeights[index] = `${Math.ceil(normalizedFullHeight * finalProgress)}px`;
       },
       async toggle(index) {
         if (this.isSwitching) {
@@ -294,7 +306,14 @@
         <p>{{ faqContent.cta.text }}</p>
 
         <div class="faq__cta-actions">
-          <a class="btn btn--ghost faq__btn" href="#pricing">{{ faqContent.cta.supportAction }}</a>
+          <a
+            class="btn btn--ghost faq__btn"
+            :href="faqContent.cta.supportUrl || '#faq'"
+            :target="faqContent.cta.supportUrl && faqContent.cta.supportUrl.indexOf('http') === 0 ? '_blank' : null"
+            :rel="faqContent.cta.supportUrl && faqContent.cta.supportUrl.indexOf('http') === 0 ? 'noopener noreferrer' : null"
+          >
+            {{ faqContent.cta.supportAction }}
+          </a>
           <a class="btn btn--primary faq__btn" href="#pricing">{{ faqContent.cta.buyAction }}</a>
         </div>
       </div>

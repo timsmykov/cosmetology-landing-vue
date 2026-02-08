@@ -39,6 +39,11 @@
           this.$nextTick(resolve);
         });
       },
+      nextFrameAsync() {
+        return new Promise((resolve) => {
+          window.requestAnimationFrame(() => resolve());
+        });
+      },
       getTypingApi() {
         return window.Landing && window.Landing.typing;
       },
@@ -178,12 +183,24 @@
 
         const collapseWithPanel = Boolean(options.collapseWithPanel);
         const fullHeight = collapseWithPanel ? this.getFullExpertHeight(index) : 0;
+        const normalizedFullHeight = Math.ceil(Math.max(0, fullHeight));
 
         if (direction === 'forward') {
           typing.setProgress(expertContent, 0);
-          this.expertHeights[index] = '0px';
-          await this.nextTickAsync();
           this.setExpertAnimationVars(index, { height: 0 });
+        } else if (collapseWithPanel) {
+          this.expertHeights[index] = `${normalizedFullHeight}px`;
+          this.setExpertAnimationVars(index, { height: normalizedFullHeight });
+          await this.nextFrameAsync();
+          this.expertHeights[index] = '0px';
+          this.setExpertAnimationVars(index, { height: 0 });
+        }
+
+        if (collapseWithPanel && direction === 'forward') {
+          this.expertHeights[index] = '0px';
+          await this.nextFrameAsync();
+          this.expertHeights[index] = `${normalizedFullHeight}px`;
+          this.setExpertAnimationVars(index, { height: normalizedFullHeight });
         }
 
         const animateOptions = {
@@ -194,17 +211,10 @@
           animateOptions.progressWindow = options.progressWindow;
         }
 
-        if (collapseWithPanel) {
-          animateOptions.onUpdate = (progress) => {
-            const nextHeight = Math.ceil(fullHeight * Math.max(0, Math.min(1, progress)));
-            this.setExpertAnimationVars(index, { height: nextHeight });
-          };
-        }
-
         await typing.animate(expertContent, direction, animateOptions);
         const finalProgress = direction === 'forward' ? 1 : 0;
-        this.setExpertAnimationVars(index, { height: fullHeight * finalProgress });
-        this.expertHeights[index] = `${Math.ceil(fullHeight * finalProgress)}px`;
+        this.setExpertAnimationVars(index, { height: normalizedFullHeight * finalProgress });
+        this.expertHeights[index] = `${Math.ceil(normalizedFullHeight * finalProgress)}px`;
       },
       async toggleExpert(index) {
         if (this.isExpertSwitching(index)) {

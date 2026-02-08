@@ -132,13 +132,6 @@
   font-weight: 800;
 }
 
-.hero__aux-text {
-  margin: 0;
-  color: #7c5564;
-  font-size: clamp(0.81rem, 2.5vw, 0.93rem);
-  line-height: 1.42;
-}
-
 .hero__btn {
   position: relative;
   overflow: hidden;
@@ -185,14 +178,6 @@
   width: clamp(6.5rem, 30vw, 10.5rem);
   aspect-ratio: 1;
   background: radial-gradient(circle at 35% 30%, rgba(255, 185, 204, 0.95) 0%, rgba(253, 120, 156, 0.68) 62%, rgba(244, 88, 136, 0.58) 100%);
-}
-
-.hero__orb--bottom {
-  left: -4%;
-  bottom: -9%;
-  width: clamp(7rem, 32vw, 11rem);
-  aspect-ratio: 1;
-  background: radial-gradient(circle at 40% 45%, rgba(255, 204, 218, 0.95) 0%, rgba(255, 143, 176, 0.7) 60%, rgba(248, 106, 154, 0.6) 100%);
 }
 
 @media (min-width: 48em) {

@@ -29,16 +29,32 @@
     }
 
     let isTicking = false;
+    const previousShifts = {
+      topX: '',
+      topY: '',
+      bottomX: '',
+      bottomY: ''
+    };
+
+    const setShift = (target, xVar, yVar, xValue, yValue) => {
+      if (previousShifts[xVar] !== xValue) {
+        target.style.setProperty('--orb-shift-x', xValue);
+        previousShifts[xVar] = xValue;
+      }
+
+      if (previousShifts[yVar] !== yValue) {
+        target.style.setProperty('--orb-shift-y', yValue);
+        previousShifts[yVar] = yValue;
+      }
+    };
 
     const update = () => {
       const rect = hero.getBoundingClientRect();
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
 
       if (rect.bottom < 0 || rect.top > viewportHeight) {
-        topOrb.style.setProperty('--orb-shift-x', '0px');
-        topOrb.style.setProperty('--orb-shift-y', '0px');
-        bottomOrb.style.setProperty('--orb-shift-x', '0px');
-        bottomOrb.style.setProperty('--orb-shift-y', '0px');
+        setShift(topOrb, 'topX', 'topY', '0px', '0px');
+        setShift(bottomOrb, 'bottomX', 'bottomY', '0px', '0px');
         return;
       }
 
@@ -47,10 +63,8 @@
       const yShift = centeredProgress * 20;
       const xShift = centeredProgress * 12;
 
-      topOrb.style.setProperty('--orb-shift-x', `${xShift.toFixed(2)}px`);
-      topOrb.style.setProperty('--orb-shift-y', `${(-yShift * 0.8).toFixed(2)}px`);
-      bottomOrb.style.setProperty('--orb-shift-x', `${(-xShift * 0.65).toFixed(2)}px`);
-      bottomOrb.style.setProperty('--orb-shift-y', `${(yShift * 0.55).toFixed(2)}px`);
+      setShift(topOrb, 'topX', 'topY', `${xShift.toFixed(2)}px`, `${(-yShift * 0.8).toFixed(2)}px`);
+      setShift(bottomOrb, 'bottomX', 'bottomY', `${(-xShift * 0.65).toFixed(2)}px`, `${(yShift * 0.55).toFixed(2)}px`);
     };
 
     const requestTick = () => {
@@ -120,14 +134,22 @@
     revealItems.forEach((item) => {
       item.classList.add('reveal-ready');
     });
+    const unresolvedItems = new Set(
+      revealItems.filter((item) => item.getAttribute('data-reveal-repeat') !== 'true')
+    );
 
     const revealVisibleNow = () => {
+      if (!unresolvedItems.size) {
+        return;
+      }
+
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
       const topBoundary = viewportHeight * 1.22;
       const bottomBoundary = -viewportHeight * 0.2;
 
-      revealItems.forEach((item) => {
-        if (item.classList.contains('is-inview')) {
+      unresolvedItems.forEach((item) => {
+        if (!item || !item.isConnected || item.classList.contains('is-inview')) {
+          unresolvedItems.delete(item);
           return;
         }
 
@@ -136,6 +158,7 @@
 
         if (isVisibleEnough) {
           item.classList.add('is-inview');
+          unresolvedItems.delete(item);
         }
       });
     };
@@ -150,6 +173,7 @@
             target.classList.add('is-inview');
 
             if (!repeat) {
+              unresolvedItems.delete(target);
               observer.unobserve(target);
             }
           } else if (repeat) {
@@ -170,6 +194,10 @@
 
     let isTicking = false;
     const requestVisibleCheck = () => {
+      if (!unresolvedItems.size) {
+        return;
+      }
+
       if (isTicking) {
         return;
       }
@@ -190,10 +218,15 @@
     };
 
     const revealFallback = () => {
+      if (!unresolvedItems.size) {
+        return;
+      }
+
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
 
-      revealItems.forEach((item) => {
-        if (item.classList.contains('is-inview')) {
+      unresolvedItems.forEach((item) => {
+        if (!item || !item.isConnected || item.classList.contains('is-inview')) {
+          unresolvedItems.delete(item);
           return;
         }
 
@@ -202,6 +235,7 @@
 
         if (shouldReveal) {
           item.classList.add('is-inview');
+          unresolvedItems.delete(item);
         }
       });
     };
@@ -223,13 +257,12 @@
     };
 
     revealVisibleNow();
-    window.addEventListener('scroll', requestVisibleCheck, { passive: true });
     window.addEventListener('resize', requestVisibleCheck, { passive: true });
+    window.addEventListener('orientationchange', requestVisibleCheck, { passive: true });
     window.addEventListener('hashchange', scheduleVisibleChecks);
     window.addEventListener('pageshow', scheduleVisibleChecks);
     document.addEventListener('click', handleAnchorClick);
     window.setTimeout(scheduleVisibleChecks, 420);
-    window.setTimeout(scheduleVisibleChecks, 980);
     window.setTimeout(revealFallback, 1800);
 
     initFadeImages();

@@ -30,9 +30,9 @@
 
       if (!hasPhoneMention) {
         if (focusIndex >= 0) {
-          highlights.splice(focusIndex + 1, 0, 'С телефона');
+          highlights.splice(focusIndex + 1, 0, 'Работа с телефона');
         } else {
-          highlights.push('С телефона');
+          highlights.push('Работа с телефона');
         }
       }
 
@@ -71,7 +71,6 @@
           <div class="hero__aux" data-reveal data-reveal-delay="290">
             <p class="hero__aux-label">AI + Instagram</p>
             <p class="hero__aux-title">Система для косметолога</p>
-            <p class="hero__aux-text">Контент, прогрев и заявки по понятному алгоритму.</p>
           </div>
 
           <div class="hero__actions" data-reveal data-reveal-delay="320">
@@ -84,7 +83,6 @@
       </div>
 
       <div class="hero__orb hero__orb--top" aria-hidden="true"></div>
-      <div class="hero__orb hero__orb--bottom" aria-hidden="true"></div>
     </div>
   </div>
 </section>

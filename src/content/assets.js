@@ -1,19 +1,19 @@
 import creator1519 from '../assets/images/creators/img-1519.png';
 import creator1520 from '../assets/images/creators/img-1520.png';
 
-import collapsed1 from '../assets/images/program-collapsed/webinar-1.png';
-import collapsed2 from '../assets/images/program-collapsed/webinar-2.png';
-import collapsed3 from '../assets/images/program-collapsed/webinar-3.png';
-import collapsed4 from '../assets/images/program-collapsed/webinar-4.png';
-import collapsed5 from '../assets/images/program-collapsed/webinar-5.png';
-import collapsed6 from '../assets/images/program-collapsed/webinar-6.png';
+import collapsed1 from '../assets/images/program-collapsed/webinar-1.jpg';
+import collapsed2 from '../assets/images/program-collapsed/webinar-2.jpg';
+import collapsed3 from '../assets/images/program-collapsed/webinar-3.jpg';
+import collapsed4 from '../assets/images/program-collapsed/webinar-4.jpg';
+import collapsed5 from '../assets/images/program-collapsed/webinar-5.jpg';
+import collapsed6 from '../assets/images/program-collapsed/webinar-6.jpg';
 
-import webinarExpanded1 from '../assets/images/program-expanded/webinar-1.png';
-import webinarExpanded2 from '../assets/images/program-expanded/webinar-2.png';
-import webinarExpanded3 from '../assets/images/program-expanded/webinar-3.png';
-import webinarExpanded4 from '../assets/images/program-expanded/webinar-4.png';
-import webinarExpanded5 from '../assets/images/program-expanded/webinar-5.png';
-import webinarExpanded6 from '../assets/images/program-expanded/webinar-6.png';
+import webinarExpanded1 from '../assets/images/program-expanded/webinar-1.jpg';
+import webinarExpanded2 from '../assets/images/program-expanded/webinar-2.jpg';
+import webinarExpanded3 from '../assets/images/program-expanded/webinar-3.jpg';
+import webinarExpanded4 from '../assets/images/program-expanded/webinar-4.jpg';
+import webinarExpanded5 from '../assets/images/program-expanded/webinar-5.jpg';
+import webinarExpanded6 from '../assets/images/program-expanded/webinar-6.jpg';
 
 const imageAssets = {
   'creators/img-1519.png': creator1519,

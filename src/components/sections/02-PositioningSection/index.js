@@ -44,7 +44,6 @@
 
       <div class="positioning__footer" data-reveal data-reveal-delay="300">
         <a class="btn btn--primary positioning__action" href="#pricing">{{ positioning.action }}</a>
-        <p class="positioning__footnote">Формат выстроен так, чтобы внедрять инструменты прямо с телефона.</p>
       </div>
 
       <blockquote class="positioning__quote" data-reveal data-reveal-delay="380">

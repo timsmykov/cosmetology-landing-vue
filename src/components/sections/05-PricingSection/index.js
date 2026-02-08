@@ -15,12 +15,14 @@
 
       const plans = Array.isArray(pricing.plans)
         ? pricing.plans.map((plan) => ({
+            anchorId: plan && plan.anchorId ? plan.anchorId : '',
             name: plan && plan.name ? plan.name : '',
             include: plan && plan.include ? plan.include : '',
             audience: plan && plan.audience ? plan.audience : '',
             oldPrice: plan && plan.oldPrice ? plan.oldPrice : '',
             newPrice: plan && plan.newPrice ? plan.newPrice : '',
             action: plan && plan.action ? plan.action : '',
+            paymentUrl: plan && typeof plan.paymentUrl === 'string' ? plan.paymentUrl.trim() : '',
             recommended: Boolean(plan && plan.recommended)
           }))
         : [];
@@ -45,6 +47,7 @@
         <article
           class="pricing__card"
           :class="{ 'pricing__card--recommended': plan.recommended }"
+          :id="plan.anchorId || null"
           v-for="(plan, index) in plans"
           :key="plan.name + index"
           data-reveal
@@ -61,18 +64,28 @@
           </div>
 
           <p class="pricing__prices" aria-label="Стоимость тарифа">
-            <span class="pricing__old">{{ plan.oldPrice }}</span>
+            <span v-if="plan.oldPrice" class="pricing__old">{{ plan.oldPrice }}</span>
             <strong class="pricing__new">{{ plan.newPrice }}</strong>
           </p>
 
-          <a class="btn btn--primary pricing__action" href="#final">{{ plan.action }}</a>
+          <a
+            v-if="plan.paymentUrl"
+            class="btn btn--primary pricing__action"
+            :href="plan.paymentUrl"
+            :target="plan.paymentUrl.indexOf('http') === 0 ? '_blank' : null"
+            :rel="plan.paymentUrl.indexOf('http') === 0 ? 'noopener noreferrer' : null"
+          >
+            {{ plan.action }}
+          </a>
+          <button v-else class="btn btn--primary pricing__action" type="button" disabled>
+            {{ plan.action }}
+          </button>
         </article>
       </div>
 
       <div class="pricing__note" v-if="note.length" data-reveal data-reveal-delay="420">
         <p v-for="(line, index) in note" :key="line + index">
           <strong v-if="index === 0">{{ line }}</strong>
-          <em v-else-if="index === note.length - 1">{{ line }}</em>
           <template v-else>{{ line }}</template>
         </p>
       </div>

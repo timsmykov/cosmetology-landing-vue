@@ -216,7 +216,6 @@
 }
 
 .team__expert--animating .team__expert-body {
-  transition: none;
   opacity: 1;
   transform: translateY(0);
 }

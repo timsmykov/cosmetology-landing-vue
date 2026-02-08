@@ -159,7 +159,6 @@
 }
 
 .faq__item--animating .faq__answer-wrap {
-  transition: none;
   opacity: 1;
   transform: translateY(0);
 }

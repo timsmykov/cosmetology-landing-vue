@@ -31,7 +31,8 @@
         nodes: [],
         targets: [],
         total: 1,
-        progress: 1
+        progress: 1,
+        roundedTimeline: Number.NaN
       });
     }
 
@@ -73,6 +74,7 @@
     });
 
     state.total = Math.max(cursor - GAP_WEIGHT, 1);
+    state.roundedTimeline = Number.NaN;
 
     return state.targets;
   }
@@ -110,6 +112,14 @@
 
     const normalized = clamp(progress, 0, 1);
     const timeline = normalized * state.total;
+    const roundedTimeline = Math.round(timeline);
+
+    if (state.roundedTimeline === roundedTimeline) {
+      state.progress = normalized;
+      return;
+    }
+
+    state.roundedTimeline = roundedTimeline;
 
     targets.forEach((target) => {
       const segmentLength = Math.max(target.length, 1);
