@@ -105,6 +105,104 @@
 
   function initMotion() {
     const revealItems = Array.from(document.querySelectorAll('[data-reveal]'));
+    let scheduleVisibleChecks = () => {};
+
+    const getInPageTarget = (href) => {
+      if (!href || href === '#' || href.charAt(0) !== '#') {
+        return null;
+      }
+
+      const rawId = href.slice(1);
+
+      if (!rawId) {
+        return null;
+      }
+
+      const targetId = window.decodeURIComponent(rawId);
+
+      if (!targetId) {
+        return null;
+      }
+
+      return document.getElementById(targetId);
+    };
+
+    const scrollToTarget = (target) => {
+      if (!target || typeof target.scrollIntoView !== 'function') {
+        return;
+      }
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      target.scrollIntoView({
+        behavior: reducedMotion ? 'auto' : 'smooth',
+        block: 'start'
+      });
+    };
+
+    const clearHash = () => {
+      if (!window.location.hash || !window.history || typeof window.history.replaceState !== 'function') {
+        return;
+      }
+
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+    };
+
+    const shouldBypassCustomAnchor = (event) => {
+      if (!event) {
+        return false;
+      }
+
+      if (event.defaultPrevented) {
+        return true;
+      }
+
+      if (event.button !== 0) {
+        return true;
+      }
+
+      return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+    };
+
+    const handleAnchorClick = (event) => {
+      const trigger = event.target && event.target.closest && event.target.closest('a[href^="#"]');
+
+      if (!trigger || shouldBypassCustomAnchor(event)) {
+        return;
+      }
+
+      const href = trigger.getAttribute('href') || '';
+
+      if (!href || href === '#') {
+        return;
+      }
+
+      const target = getInPageTarget(href);
+
+      if (!target) {
+        return;
+      }
+
+      event.preventDefault();
+      clearHash();
+      scrollToTarget(target);
+      window.requestAnimationFrame(() => {
+        scheduleVisibleChecks();
+      });
+    };
+
+    const handleHashChange = () => {
+      const target = getInPageTarget(window.location.hash || '');
+
+      if (target) {
+        clearHash();
+        scrollToTarget(target);
+      }
+
+      scheduleVisibleChecks();
+    };
+
+    document.addEventListener('click', handleAnchorClick);
 
     if (!revealItems.length) {
       initFadeImages();
@@ -210,7 +308,7 @@
       });
     };
 
-    const scheduleVisibleChecks = () => {
+    scheduleVisibleChecks = () => {
       requestVisibleCheck();
       [120, 280, 520].forEach((delay) => {
         window.setTimeout(requestVisibleCheck, delay);
@@ -240,28 +338,11 @@
       });
     };
 
-    const handleAnchorClick = (event) => {
-      const trigger = event.target && event.target.closest && event.target.closest('a[href^="#"]');
-
-      if (!trigger) {
-        return;
-      }
-
-      const href = trigger.getAttribute('href') || '';
-
-      if (!href || href === '#') {
-        return;
-      }
-
-      window.requestAnimationFrame(scheduleVisibleChecks);
-    };
-
     revealVisibleNow();
     window.addEventListener('resize', requestVisibleCheck, { passive: true });
     window.addEventListener('orientationchange', requestVisibleCheck, { passive: true });
-    window.addEventListener('hashchange', scheduleVisibleChecks);
+    window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('pageshow', scheduleVisibleChecks);
-    document.addEventListener('click', handleAnchorClick);
     window.setTimeout(scheduleVisibleChecks, 420);
     window.setTimeout(revealFallback, 1800);
 
