@@ -35,8 +35,8 @@ import { resolveImageAsset } from './assets.js';
           'Писать посты без усилий: простые инструкции для готовых текстов.'
         ],
         images: [
-          resolveImageAsset('webinar-1/ioHu1Z0UhgWXdrzIp6MtF.png'),
-          resolveImageAsset('webinar-1/uo5I7e0eecGukfaBBxUkm.png')
+          resolveImageAsset('program-collapsed/webinar-1.png'),
+          resolveImageAsset('program-expanded/webinar-1.png')
         ]
       },
       {
@@ -51,7 +51,10 @@ import { resolveImageAsset } from './assets.js';
           'Формировать стратегии и проводить исследования.',
           'Строить серии контента на недели вперёд.'
         ],
-        images: [resolveImageAsset('webinar-2/ucPvVDe_k8UR7-XjFZqHg.png')]
+        images: [
+          resolveImageAsset('program-collapsed/webinar-2.png'),
+          resolveImageAsset('program-expanded/webinar-2.png')
+        ]
       },
       {
         step: 'Шаг 3 из 6',
@@ -66,9 +69,8 @@ import { resolveImageAsset } from './assets.js';
           'Профессионально работать со светом, тенями и реалистичностью.'
         ],
         images: [
-          resolveImageAsset('webinar-3/8e9NW0WgGu3oc_EMboJPn.png'),
-          resolveImageAsset('webinar-3/VFcSpHvN-HF7fXEI2wTSh.png'),
-          resolveImageAsset('webinar-3/0cHMXiYWe39ESGlZgDXou.png')
+          resolveImageAsset('program-collapsed/webinar-3.png'),
+          resolveImageAsset('program-expanded/webinar-3.png')
         ]
       },
       {
@@ -83,7 +85,10 @@ import { resolveImageAsset } from './assets.js';
           'Генерировать видео по текстовому описанию.',
           'Вставлять музыку, эффекты и субтитры автоматически.'
         ],
-        images: [resolveImageAsset('webinar-4/_g1o8DglZ08SX689x_Th2.png')]
+        images: [
+          resolveImageAsset('program-collapsed/webinar-4.png'),
+          resolveImageAsset('program-expanded/webinar-4.png')
+        ]
       },
       {
         step: 'Шаг 5 из 6',
@@ -97,7 +102,10 @@ import { resolveImageAsset } from './assets.js';
           'Превращать тексты в живые видео с вашим голосом.',
           'Масштабировать контент без постоянных съёмок.'
         ],
-        images: [resolveImageAsset('webinar-5/ai-in-instagram-intensive.png')]
+        images: [
+          resolveImageAsset('program-collapsed/webinar-5.png'),
+          resolveImageAsset('program-expanded/webinar-5.png')
+        ]
       },
       {
         step: 'Шаг 6 из 6',
@@ -111,7 +119,10 @@ import { resolveImageAsset } from './assets.js';
           'Использовать скрипты и ответы в Direct с помощью ИИ.',
           'Вести учёт и аналитику: лиды, конверсия, улучшение результата.'
         ],
-        images: [resolveImageAsset('webinar-6/hSiTlNXQf5UEzbMqBYPDV.png')]
+        images: [
+          resolveImageAsset('program-collapsed/webinar-6.png'),
+          resolveImageAsset('program-expanded/webinar-6.png')
+        ]
       }
     ]
   };

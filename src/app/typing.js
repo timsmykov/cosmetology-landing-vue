@@ -54,18 +54,18 @@
     state.nodes = nodes;
     state.targets = nodes.map((node) => {
       const source = node.getAttribute('data-type-source') || node.textContent || '';
-      const chars = Array.from(source);
-      const length = chars.length;
+      const length = source.length;
 
       node.setAttribute('data-type-source', source);
 
       const target = {
         node,
         source,
-        chars,
         length,
         start: cursor,
-        end: cursor + Math.max(length, 1)
+        end: cursor + Math.max(length, 1),
+        lastVisibleCount: -1,
+        isEmpty: null
       };
 
       cursor = target.end + GAP_WEIGHT;
@@ -78,17 +78,25 @@
   }
 
   function setTargetText(target, visibleCount) {
+    if (target.lastVisibleCount === visibleCount) {
+      return false;
+    }
+
     if (visibleCount <= 0) {
       target.node.textContent = '';
-      return;
+      target.lastVisibleCount = visibleCount;
+      return true;
     }
 
     if (visibleCount >= target.length) {
       target.node.textContent = target.source;
-      return;
+      target.lastVisibleCount = visibleCount;
+      return true;
     }
 
-    target.node.textContent = target.chars.slice(0, visibleCount).join('');
+    target.node.textContent = target.source.slice(0, visibleCount);
+    target.lastVisibleCount = visibleCount;
+    return true;
   }
 
   function applyProgress(container, progress) {
@@ -108,8 +116,12 @@
       const local = clamp((timeline - target.start) / segmentLength, 0, 1);
       const visibleCount = Math.round(target.length * local);
       setTargetText(target, visibleCount);
-      target.node.style.removeProperty('opacity');
-      target.node.classList.toggle('is-type-empty', visibleCount <= 0);
+
+      const isEmpty = visibleCount <= 0;
+      if (target.isEmpty !== isEmpty) {
+        target.node.classList.toggle('is-type-empty', isEmpty);
+        target.isEmpty = isEmpty;
+      }
     });
 
     state.progress = normalized;

@@ -342,7 +342,7 @@
               </div>
 
               <figure class="program-card__thumb" aria-hidden="true">
-                <img :src="webinar.previewImage" :alt="webinar.title" loading="lazy" data-fade-image />
+                <img :src="webinar.previewImage" :alt="webinar.title" loading="lazy" decoding="async" data-fade-image />
               </figure>
             </div>
 
@@ -368,7 +368,7 @@
 
               <div class="program-card__gallery">
                 <figure class="program-card__figure" v-for="(img, imageIndex) in webinar.images" :key="webinar.title + img + imageIndex">
-                  <img :src="img" :alt="webinar.title" loading="lazy" data-fade-image />
+                  <img :src="img" :alt="webinar.title" loading="lazy" decoding="async" data-fade-image />
                 </figure>
               </div>
             </div>
