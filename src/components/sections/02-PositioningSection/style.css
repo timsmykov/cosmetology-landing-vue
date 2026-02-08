@@ -1,0 +1,44 @@
+.positioning__grid {
+  margin-top: 28px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.positioning__card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.positioning__card h3 {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  color: var(--accent-dark);
+}
+
+.positioning__card p {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.positioning__quote {
+  margin: 24px 0;
+  padding: 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #7c2840;
+}
+
+@media (max-width: 960px) {
+  .positioning__grid {
+    grid-template-columns: 1fr;
+  }
+}

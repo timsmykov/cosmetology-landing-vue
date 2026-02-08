@@ -1,0 +1,68 @@
+.team__leads {
+  margin-top: 24px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.team__lead,
+.team__expert {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.team__photo {
+  aspect-ratio: 4/3;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 14px;
+}
+
+.team h3,
+.team h4 {
+  margin: 0;
+  color: #7c2840;
+}
+
+.team__role {
+  margin: 8px 0 14px;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.team ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.team__subtitle {
+  margin: 28px 0 14px;
+  font-size: 1.4rem;
+  color: #7c2840;
+}
+
+.team__experts {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.team__experts p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 960px) {
+  .team__leads,
+  .team__experts {
+    grid-template-columns: 1fr;
+  }
+}
