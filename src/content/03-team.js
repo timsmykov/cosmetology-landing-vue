@@ -1,7 +1,8 @@
+import { resolveImageAsset } from './assets.js';
+
 (function registerTeamContent() {
   window.Landing = window.Landing || {};
   window.Landing.content = window.Landing.content || {};
-  const asset = (path) => new URL(path, import.meta.url).href;
 
   window.Landing.content.team = {
     title: 'Кто вас ведёт',
@@ -10,7 +11,7 @@
       {
         name: 'Артём Шапошников',
         role: 'Руководитель курса',
-        photo: asset('../assets/images/creators/img-1519.jpg'),
+        photo: resolveImageAsset('creators/img-1519.jpg'),
         points: [
           'К.э.н., бизнес-тренер, коуч (ICU), поведенческий экономист, эксперт по CRM.',
           'CEO IT-компании с 20-летним опытом управления командами до 120+ человек.',
@@ -23,7 +24,7 @@
       {
         name: 'Герман Черкасов',
         role: 'Организатор и эксперт индустрии',
-        photo: asset('../assets/images/creators/img-1520.jpg'),
+        photo: resolveImageAsset('creators/img-1520.jpg'),
         points: [
           'Кандидат медицинских наук, врач-косметолог, старший научный сотрудник РНЦХ им. Петровского.',
           'Обучил более 2000 косметологов по всей России.',

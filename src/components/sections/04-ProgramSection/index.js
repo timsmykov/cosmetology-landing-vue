@@ -39,7 +39,7 @@
               date: webinar && webinar.date ? webinar.date : '',
               text: webinar && webinar.text ? webinar.text : '',
               learn,
-              previewImage: normalizedImages[0],
+              previewImage: webinar && webinar.previewImage ? webinar.previewImage : normalizedImages[0],
               images: normalizedImages
             };
           })

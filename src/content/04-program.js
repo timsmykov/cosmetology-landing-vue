@@ -1,7 +1,8 @@
+import { resolveImageAsset } from './assets.js';
+
 (function registerProgramContent() {
   window.Landing = window.Landing || {};
   window.Landing.content = window.Landing.content || {};
-  const asset = (path) => new URL(path, import.meta.url).href;
 
   window.Landing.content.program = {
     title: 'Программа: путь трансформации',
@@ -25,6 +26,7 @@
         step: 'Шаг 1 из 6',
         title: 'Вебинар 1. Введение в ИИ',
         date: '10 марта, 19:00 (МСК)',
+        previewImage: resolveImageAsset('program-collapsed/webinar-1.png'),
         subtitle: 'Первый контент без стресса: фото + 3 поста за один вечер',
         text: 'На вебинаре мы за 5 минут превратим обычный кадр с телефона в аккуратную картинку, а идею — в готовый текст для поста.',
         learn: [
@@ -33,14 +35,15 @@
           'Писать посты без усилий: простые инструкции для готовых текстов.'
         ],
         images: [
-          asset('../assets/images/webinar-1/ioHu1Z0UhgWXdrzIp6MtF.png'),
-          asset('../assets/images/webinar-1/uo5I7e0eecGukfaBBxUkm.png')
+          resolveImageAsset('webinar-1/ioHu1Z0UhgWXdrzIp6MtF.png'),
+          resolveImageAsset('webinar-1/uo5I7e0eecGukfaBBxUkm.png')
         ]
       },
       {
         step: 'Шаг 2 из 6',
         title: 'Вебинар 2. Текст — Голос',
         date: '17 марта, 19:00 (МСК)',
+        previewImage: resolveImageAsset('program-collapsed/webinar-2.png'),
         subtitle: 'Ваш аккаунт заговорил. Появились смыслы.',
         text: 'Генерируйте посты любого формата: продающие, экспертные, вовлекающие. Адаптируйте тон под аудиторию без потери естественности.',
         learn: [
@@ -48,12 +51,13 @@
           'Формировать стратегии и проводить исследования.',
           'Строить серии контента на недели вперёд.'
         ],
-        images: [asset('../assets/images/webinar-2/ucPvVDe_k8UR7-XjFZqHg.png')]
+        images: [resolveImageAsset('webinar-2/ucPvVDe_k8UR7-XjFZqHg.png')]
       },
       {
         step: 'Шаг 3 из 6',
         title: 'Вебинар 3. Фото-профи — Стиль',
         date: '24 марта, 19:00 (МСК)',
+        previewImage: resolveImageAsset('program-collapsed/webinar-3.png'),
         subtitle: 'Профиль обрёл айдентику. Он выглядит дорого и цельно.',
         text: 'Вы настроите визуальный стиль профиля, научитесь добиваться реалистичной картинки и уйдёте от эффекта «дешёвого ИИ».',
         learn: [
@@ -62,15 +66,16 @@
           'Профессионально работать со светом, тенями и реалистичностью.'
         ],
         images: [
-          asset('../assets/images/webinar-3/8e9NW0WgGu3oc_EMboJPn.png'),
-          asset('../assets/images/webinar-3/VFcSpHvN-HF7fXEI2wTSh.png'),
-          asset('../assets/images/webinar-3/0cHMXiYWe39ESGlZgDXou.png')
+          resolveImageAsset('webinar-3/8e9NW0WgGu3oc_EMboJPn.png'),
+          resolveImageAsset('webinar-3/VFcSpHvN-HF7fXEI2wTSh.png'),
+          resolveImageAsset('webinar-3/0cHMXiYWe39ESGlZgDXou.png')
         ]
       },
       {
         step: 'Шаг 4 из 6',
         title: 'Вебинар 4. Видео — Динамика',
         date: '31 марта, 19:00 (МСК)',
+        previewImage: resolveImageAsset('program-collapsed/webinar-4.png'),
         subtitle: 'Статичная картинка превратилась в охватный ролик.',
         text: 'Reels — ключевой инструмент охвата. Создавайте видео из фото за 10 минут без съёмочной команды.',
         learn: [
@@ -78,12 +83,13 @@
           'Генерировать видео по текстовому описанию.',
           'Вставлять музыку, эффекты и субтитры автоматически.'
         ],
-        images: [asset('../assets/images/webinar-4/_g1o8DglZ08SX689x_Th2.png')]
+        images: [resolveImageAsset('webinar-4/_g1o8DglZ08SX689x_Th2.png')]
       },
       {
         step: 'Шаг 5 из 6',
         title: 'Вебинар 5. Аватар — Масштаб',
         date: '7 апреля, 19:00 (МСК)',
+        previewImage: resolveImageAsset('program-collapsed/webinar-5.png'),
         subtitle: 'Вы работаете, а ваш цифровой двойник вещает в сторис.',
         text: 'Цифровой аватар — мощный инструмент масштабирования. Превращайте идеи в живые видео с вашим голосом и лицом.',
         learn: [
@@ -91,12 +97,13 @@
           'Превращать тексты в живые видео с вашим голосом.',
           'Масштабировать контент без постоянных съёмок.'
         ],
-        images: [asset('../assets/images/webinar-5/ai-in-instagram-intensive.png')]
+        images: [resolveImageAsset('webinar-5/ai-in-instagram-intensive.png')]
       },
       {
         step: 'Шаг 6 из 6',
         title: 'Вебинар 6. Маркетинг и лиды',
         date: '14 апреля, 19:00 (МСК)',
+        previewImage: resolveImageAsset('program-collapsed/webinar-6.png'),
         subtitle: 'Контент → заявки: воронка, ответы клиентам и аналитика в Instagram с ИИ.',
         text: 'Финал эволюции: как связать посты/Reels/аватар с записью, не терять лидов в директ и понимать, что реально работает.',
         learn: [
@@ -104,7 +111,7 @@
           'Использовать скрипты и ответы в Direct с помощью ИИ.',
           'Вести учёт и аналитику: лиды, конверсия, улучшение результата.'
         ],
-        images: [asset('../assets/images/webinar-6/hSiTlNXQf5UEzbMqBYPDV.png')]
+        images: [resolveImageAsset('webinar-6/hSiTlNXQf5UEzbMqBYPDV.png')]
       }
     ]
   };
