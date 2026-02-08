@@ -71,7 +71,7 @@
           class="webinar"
           v-for="(webinar, webinarIndex) in webinars"
           :key="webinar.title + webinarIndex"
-          :data-reveal="webinarIndex % 2 === 0 ? 'left' : 'right'"
+          data-reveal
           :data-reveal-delay="80 + (webinarIndex * 40)"
         >
           <div class="webinar__content">

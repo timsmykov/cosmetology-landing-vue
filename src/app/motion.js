@@ -112,6 +112,7 @@
       revealItems.forEach((item) => {
         item.classList.add('is-inview');
       });
+      initFadeImages();
       initHeroParallax();
       return;
     }
@@ -119,6 +120,23 @@
     revealItems.forEach((item) => {
       item.classList.add('reveal-ready');
     });
+
+    const revealVisibleNow = () => {
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+
+      revealItems.forEach((item) => {
+        if (item.classList.contains('is-inview')) {
+          return;
+        }
+
+        const rect = item.getBoundingClientRect();
+        const isVisibleEnough = rect.top < viewportHeight * 0.96 && rect.bottom > 0;
+
+        if (isVisibleEnough) {
+          item.classList.add('is-inview');
+        }
+      });
+    };
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -139,14 +157,32 @@
       },
       {
         root: null,
-        threshold: 0.18,
-        rootMargin: '0px 0px -8% 0px'
+        threshold: 0.06,
+        rootMargin: '0px 0px -4% 0px'
       }
     );
 
     revealItems.forEach((item) => {
       observer.observe(item);
     });
+
+    let isTicking = false;
+    const requestVisibleCheck = () => {
+      if (isTicking) {
+        return;
+      }
+
+      isTicking = true;
+
+      window.requestAnimationFrame(() => {
+        revealVisibleNow();
+        isTicking = false;
+      });
+    };
+
+    revealVisibleNow();
+    window.addEventListener('scroll', requestVisibleCheck, { passive: true });
+    window.addEventListener('resize', requestVisibleCheck, { passive: true });
 
     initFadeImages();
     initHeroParallax();
