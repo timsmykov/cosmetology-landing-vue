@@ -233,18 +233,101 @@
 }
 
 @media (min-width: 48em) {
+  .team {
+    padding-top: clamp(1rem, 2.2vw, 1.35rem);
+  }
+
+  .team__surface {
+    gap: 1.75rem;
+    padding: 1.8rem;
+  }
+
+  .team__header {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .team__subtitle {
+    text-align: center;
+  }
+
   .team__leads {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .team__lead,
+  .team__expert {
+    padding: 1rem;
   }
 
   .team__experts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .team__expert-summary {
+    min-height: 3.35rem;
+    padding-right: 0;
+  }
+
+  .team h3,
+  .team h4,
+  .team__expert-name {
+    font-size: clamp(1.2rem, 2vw, 1.35rem);
+  }
+
+  .team__role {
+    font-size: 1.04rem;
+    line-height: 1.42;
+  }
+
+  .team ul,
+  .team__expert-body p {
+    font-size: 1.03rem;
+    line-height: 1.6;
+  }
+
+  .team__expert-icon {
+    display: none;
+  }
+
+  .team__expert-body,
+  .team__expert-body--open {
+    height: auto;
+    opacity: 1;
+    overflow: visible;
+    transform: none;
+    transition: none;
+    will-change: auto;
   }
 }
 
 @media (min-width: 64em) {
+  .team__surface {
+    gap: 1.8rem;
+    padding: 2rem;
+  }
+
   .team__experts {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .team h3,
+  .team h4,
+  .team__expert-name {
+    font-size: clamp(1.32rem, 1.55vw, 1.62rem);
+  }
+
+  .team__role {
+    font-size: clamp(1rem, 1.2vw, 1.12rem);
+  }
+
+  .team ul,
+  .team__expert-body p {
+    font-size: clamp(1.01rem, 1.1vw, 1.08rem);
+    line-height: 1.6;
   }
 }
 

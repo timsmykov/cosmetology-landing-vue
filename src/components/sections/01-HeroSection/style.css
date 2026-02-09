@@ -161,20 +161,172 @@
 }
 
 @media (min-width: 48em) {
+  .hero {
+    --hero-pad-block: clamp(1.2rem, 2.6vh, 1.9rem);
+  }
+
+  .hero__surface {
+    min-height: clamp(36rem, 89svh, 46rem);
+  }
+
+  .hero__layout {
+    padding: clamp(1.9rem, 4.3vw, 2.8rem);
+  }
+
+  .hero__content {
+    max-width: 47rem;
+    gap: 1.1rem;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .hero__title {
+    max-width: 17ch;
+    font-size: clamp(2.65rem, 5vw, 3.45rem);
+  }
+
+  .hero__text {
+    max-width: 60ch;
+    font-size: 1.15rem;
+    line-height: 1.66;
+  }
+
+  .hero__highlight {
+    font-size: 0.98rem;
+  }
+
+  .hero__highlights {
+    justify-content: center;
+  }
+
+  .hero__aux {
+    justify-items: center;
+  }
+
+  .hero__aux-title,
+  .hero__meta {
+    font-size: 1.1rem;
+  }
+
   .hero__actions {
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-inline: auto;
   }
 
   .hero__btn {
     width: auto;
-    min-width: 13rem;
+    min-width: 14rem;
+    min-height: 3.7rem;
+  }
+}
+
+@media (min-width: 48em) and (max-width: 63.99em) {
+  .hero__surface {
+    min-height: clamp(39rem, 88svh, 48rem);
+  }
+
+  .hero__layout {
+    padding: 2.2rem 2.05rem;
+  }
+
+  .hero__content {
+    max-width: 52rem;
+    gap: 1.24rem;
+  }
+
+  .hero__kicker {
+    padding: 0.45em 1.05em;
+    font-size: 0.86rem;
+  }
+
+  .hero__title {
+    max-width: 22ch;
+    font-size: clamp(2.85rem, 5.4vw, 3.55rem);
+    line-height: 1.04;
+  }
+
+  .hero__title span {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .hero__text {
+    max-width: 52ch;
+    font-size: 1.26rem;
+    line-height: 1.7;
+  }
+
+  .hero__highlight {
+    font-size: 1.05rem;
+    padding: 0.56em 0.92em;
+  }
+
+  .hero__aux-label {
+    font-size: 0.84rem;
+  }
+
+  .hero__aux-title,
+  .hero__meta {
+    font-size: 1.24rem;
+  }
+
+  .hero__actions {
+    gap: 0.9rem;
+  }
+
+  .hero__btn {
+    min-width: 17rem;
+    min-height: 4.2rem;
+    padding: 1.1rem 1.65rem;
+    font-size: 1.18rem;
   }
 }
 
 @media (min-width: 64em) {
+  .hero {
+    --hero-pad-block: clamp(1.35rem, 2.2vh, 2.1rem);
+  }
+
+  .hero__surface {
+    min-height: clamp(42rem, 90svh, 52rem);
+  }
+
   .hero__layout {
     padding-inline: clamp(2rem, 4vw, 3.75rem);
+    padding-block: clamp(2rem, 3vw, 3rem);
+  }
+
+  .hero__content {
+    max-width: 52rem;
+    gap: 1.15rem;
+  }
+
+  .hero__title {
+    max-width: 17ch;
+    font-size: clamp(3.1rem, 4.8vw, 4.25rem);
+  }
+
+  .hero__text {
+    max-width: 60ch;
+    font-size: 1.22rem;
+    line-height: 1.68;
+  }
+
+  .hero__highlight {
+    font-size: 0.97rem;
+  }
+
+  .hero__aux-title,
+  .hero__meta {
+    font-size: 1.16rem;
+  }
+
+  .hero__btn {
+    min-width: 14.5rem;
   }
 }
 

@@ -29,8 +29,7 @@
 
       return {
         pricing,
-        plans,
-        note: Array.isArray(pricing.note) ? pricing.note : []
+        plans
       };
     },
     template: `
@@ -83,12 +82,6 @@
         </article>
       </div>
 
-      <div class="pricing__note" v-if="note.length" data-reveal data-reveal-delay="420">
-        <p v-for="(line, index) in note" :key="line + index">
-          <strong v-if="index === 0">{{ line }}</strong>
-          <template v-else>{{ line }}</template>
-        </p>
-      </div>
     </div>
   </div>
 </section>

@@ -1,4 +1,8 @@
 :root {
+  /* Breakpoints:
+     mobile: 0-47.99em
+     tablet: 48em-63.99em
+     desktop: 64em+ */
   --motion-duration-fast: 260ms;
   --motion-duration-base: 420ms;
   --motion-ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);

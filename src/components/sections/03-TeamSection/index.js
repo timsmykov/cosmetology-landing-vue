@@ -15,6 +15,7 @@
         team,
         leads: Array.isArray(team.leads) ? team.leads : [],
         experts: Array.isArray(team.experts) ? team.experts : [],
+        isTabletUp: false,
         openExperts: {},
         closingExperts: {},
         animatingExperts: {},
@@ -24,10 +25,12 @@
       };
     },
     mounted() {
+      this.syncViewportMode();
       window.addEventListener('resize', this.handleResize, { passive: true });
       this.$nextTick(() => {
         this.initializeTyping();
         this.updateAllExpertHeights();
+        this.syncViewportMode();
       });
     },
     beforeUnmount() {
@@ -84,10 +87,43 @@
             return;
           }
 
-          typing.setProgress(expertContent, 0);
+          typing.setProgress(expertContent, this.isTabletUp ? 1 : 0);
+        });
+      },
+      detectTabletUp() {
+        return window.matchMedia('(min-width: 48em)').matches;
+      },
+      syncViewportMode() {
+        const nextMode = this.detectTabletUp();
+
+        if (nextMode === this.isTabletUp) {
+          return;
+        }
+
+        this.isTabletUp = nextMode;
+        this.openExperts = {};
+        this.closingExperts = {};
+        this.animatingExperts = {};
+        this.switchingExperts = {};
+
+        const typing = this.getTypingApi();
+
+        if (!typing) {
+          return;
+        }
+
+        this.experts.forEach((_, index) => {
+          const expertContent = this.getExpertContent(index);
+
+          if (!expertContent) {
+            return;
+          }
+
+          typing.setProgress(expertContent, this.isTabletUp ? 1 : 0);
         });
       },
       handleResize() {
+        this.syncViewportMode();
         this.updateAllExpertHeights();
       },
       setExpertBodyRef(index, el) {
@@ -119,6 +155,10 @@
         });
       },
       isExpertOpen(index) {
+        if (this.isTabletUp) {
+          return true;
+        }
+
         return Boolean(this.openExperts[index]) || Boolean(this.closingExperts[index]);
       },
       isExpertSwitching(index) {
@@ -149,6 +189,10 @@
         };
       },
       getExpertBodyStyle(index) {
+        if (this.isTabletUp) {
+          return null;
+        }
+
         return {
           '--expert-height': this.expertHeights[index] || '0px'
         };
@@ -217,6 +261,10 @@
         this.expertHeights[index] = `${Math.ceil(normalizedFullHeight * finalProgress)}px`;
       },
       async toggleExpert(index) {
+        if (this.isTabletUp) {
+          return;
+        }
+
         if (this.isExpertSwitching(index)) {
           return;
         }
@@ -307,6 +355,7 @@
             :data-reveal-delay="300 + (index * 90)"
           >
             <button
+              v-if="!isTabletUp"
               class="team__expert-summary"
               type="button"
               :id="getExpertButtonId(index)"
@@ -318,6 +367,10 @@
               <span class="team__role">{{ expert.role }}</span>
               <span class="team__expert-icon" aria-hidden="true"></span>
             </button>
+            <div v-else class="team__expert-summary">
+              <span class="team__expert-name">{{ expert.name }}</span>
+              <span class="team__role">{{ expert.role }}</span>
+            </div>
 
             <div
               class="team__expert-body"
@@ -326,7 +379,7 @@
               :ref="(el) => setExpertBodyRef(index, el)"
               :id="getExpertPanelId(index)"
               role="region"
-              :aria-labelledby="getExpertButtonId(index)"
+              :aria-labelledby="isTabletUp ? null : getExpertButtonId(index)"
               :aria-hidden="isExpertOpen(index) ? 'false' : 'true'"
             >
               <div class="team__expert-body-inner">
