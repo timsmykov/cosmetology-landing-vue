@@ -261,7 +261,6 @@
         this.panelRefs[index] = el;
         this.bindPanelMediaListeners(index);
         this.updatePanelHeight(index);
-        this.scheduleJourneyLayout();
       },
       bindPanelMediaListeners(index) {
         const panelWrap = this.panelRefs[index];
@@ -295,7 +294,6 @@
             }
 
             this.updatePanelHeight(index);
-            this.scheduleJourneyLayout();
           };
 
           image.addEventListener('load', recalc, { once: true });
@@ -322,7 +320,6 @@
         this.webinars.forEach((_, index) => {
           this.updatePanelHeight(index);
         });
-        this.scheduleJourneyLayout();
       },
       getViewportHeight() {
         const visualViewport = window.visualViewport;
@@ -699,7 +696,6 @@
           }
           this.animatingWebinarIndex = -1;
           affected.forEach((index) => this.resetRuntimeMotion(index));
-          this.scheduleJourneyLayout();
           return;
         }
 
@@ -711,7 +707,6 @@
         await Promise.all([flipPromise, scrollPromise]);
         this.animatingWebinarIndex = -1;
         affected.forEach((index) => this.resetRuntimeMotion(index));
-        this.scheduleJourneyLayout();
       },
       async toggleWebinar(index) {
         if (this.isSwitching) {
