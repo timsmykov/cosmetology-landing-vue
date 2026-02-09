@@ -34,15 +34,9 @@
           data-reveal="up"
           :data-reveal-delay="210 + (index * 60)"
         >
-          {{ item }}
+          <a class="self-check__item-link" href="#program">{{ item }}</a>
         </li>
       </ul>
-
-      <div class="self-check__actions" data-reveal data-reveal-delay="560">
-        <a class="btn btn--ghost self-check__action" :href="selfCheck.actionUrl || '#program'">
-          {{ selfCheck.action || 'Изучить подробности' }}
-        </a>
-      </div>
     </div>
   </div>
 </section>
