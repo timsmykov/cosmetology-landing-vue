@@ -83,8 +83,8 @@ button:focus-visible {
 
 .section-title,
 .section-text {
-  text-align: center;
-  margin-inline: auto;
+  text-align: left;
+  margin-inline: 0;
 }
 
 .positioning__header,
@@ -94,12 +94,12 @@ button:focus-visible {
 .format__header,
 .faq__header,
 .final__header {
-  justify-items: center;
-  text-align: center;
+  justify-items: start;
+  text-align: left;
 }
 
 .team__subtitle {
-  text-align: center;
+  text-align: left;
 }
 
 .btn {
@@ -242,6 +242,27 @@ button:focus-visible {
   .section-text {
     font-size: 1.22rem;
     line-height: 1.7;
+  }
+
+  .section-title,
+  .section-text {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .positioning__header,
+  .team__header,
+  .program__header,
+  .pricing__header,
+  .format__header,
+  .faq__header,
+  .final__header {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .team__subtitle {
+    text-align: center;
   }
 
   .btn {
