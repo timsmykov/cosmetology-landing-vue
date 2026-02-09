@@ -38,7 +38,8 @@
         faqContent,
         items,
         answerRefs: {},
-        answerHeights: {}
+        answerHeights: {},
+        resizeFrameId: 0
       };
     },
     mounted() {
@@ -50,6 +51,10 @@
     },
     beforeUnmount() {
       window.removeEventListener('resize', this.handleResize);
+      if (this.resizeFrameId) {
+        window.cancelAnimationFrame(this.resizeFrameId);
+        this.resizeFrameId = 0;
+      }
     },
     methods: {
       nextTickAsync() {
@@ -106,7 +111,14 @@
         });
       },
       handleResize() {
-        this.updateAllAnswerHeights();
+        if (this.resizeFrameId) {
+          return;
+        }
+
+        this.resizeFrameId = window.requestAnimationFrame(() => {
+          this.resizeFrameId = 0;
+          this.updateAllAnswerHeights();
+        });
       },
       setAnswerRef(index, el) {
         if (!el) {

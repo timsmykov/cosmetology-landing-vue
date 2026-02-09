@@ -42,7 +42,6 @@
   <div class="container">
     <div class="final__surface" data-reveal="zoom">
       <div class="final__alert" role="status" aria-live="polite" data-reveal data-reveal-delay="40">
-        <span class="final__alert-smoke" aria-hidden="true"></span>
         <h3>{{ final.alert.title }}</h3>
         <p class="final__alert-strong">{{ final.alert.countdown }}</p>
         <p class="final__alert-strong">{{ final.alert.deadline }}</p>

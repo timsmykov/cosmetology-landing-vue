@@ -13,7 +13,6 @@
           primaryUrl: '#pricing',
           secondary: ''
         },
-        steps: [],
         mobileNote: '',
         webinars: [],
         ...source,
@@ -57,11 +56,7 @@
         panelHeights: {},
         resizeFrameId: 0,
         scrollFrameId: 0,
-        restoreScrollBehavior: null,
-        programPreloadObserver: null,
-        preloadIdleId: 0,
-        preloadTimerId: 0,
-        programImagesPreloaded: false
+        restoreScrollBehavior: null
       };
     },
     mounted() {
@@ -69,7 +64,6 @@
       this.$nextTick(() => {
         this.updateAllPanelHeights();
       });
-      this.initProgramPreloadObserver();
     },
     beforeUnmount() {
       window.removeEventListener('resize', this.handleResize);
@@ -85,182 +79,8 @@
         this.restoreScrollBehavior();
         this.restoreScrollBehavior = null;
       }
-      if (this.programPreloadObserver) {
-        this.programPreloadObserver.disconnect();
-        this.programPreloadObserver = null;
-      }
-      if (this.preloadIdleId && 'cancelIdleCallback' in window) {
-        window.cancelIdleCallback(this.preloadIdleId);
-        this.preloadIdleId = 0;
-      }
-      if (this.preloadTimerId) {
-        window.clearTimeout(this.preloadTimerId);
-        this.preloadTimerId = 0;
-      }
     },
     methods: {
-      initProgramPreloadObserver() {
-        if (this.programImagesPreloaded) {
-          return;
-        }
-
-        const section = this.$el;
-
-        if (!section) {
-          this.scheduleProgramImagePreload();
-          return;
-        }
-
-        if (!('IntersectionObserver' in window)) {
-          this.scheduleProgramImagePreload();
-          return;
-        }
-
-        if (this.programPreloadObserver) {
-          this.programPreloadObserver.disconnect();
-        }
-
-        this.programPreloadObserver = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (!entry.isIntersecting) {
-                return;
-              }
-
-              this.scheduleProgramImagePreload();
-
-              if (this.programPreloadObserver) {
-                this.programPreloadObserver.disconnect();
-                this.programPreloadObserver = null;
-              }
-            });
-          },
-          {
-            root: null,
-            threshold: 0.01,
-            rootMargin: '42% 0px 42% 0px'
-          }
-        );
-
-        this.programPreloadObserver.observe(section);
-      },
-      scheduleProgramImagePreload() {
-        if (this.programImagesPreloaded) {
-          return;
-        }
-
-        if (this.preloadIdleId || this.preloadTimerId) {
-          return;
-        }
-
-        const runPreload = () => {
-          this.preloadIdleId = 0;
-          this.preloadTimerId = 0;
-          this.preloadProgramImages();
-        };
-
-        if ('requestIdleCallback' in window) {
-          this.preloadIdleId = window.requestIdleCallback(runPreload, { timeout: 900 });
-          return;
-        }
-
-        this.preloadTimerId = window.setTimeout(runPreload, 120);
-      },
-      collectProgramImageUrls() {
-        const urls = new Set();
-
-        this.webinars.forEach((webinar) => {
-          const sources = [
-            webinar && webinar.previewImage ? webinar.previewImage : '',
-            ...(Array.isArray(webinar && webinar.images) ? webinar.images : [])
-          ];
-
-          sources.forEach((src) => {
-            if (typeof src !== 'string') {
-              return;
-            }
-
-            const normalized = src.trim();
-
-            if (!normalized) {
-              return;
-            }
-
-            urls.add(normalized);
-          });
-        });
-
-        return Array.from(urls);
-      },
-      preloadImage(url) {
-        return new Promise((resolve) => {
-          const image = new Image();
-
-          const done = () => {
-            resolve();
-          };
-
-          image.decoding = 'async';
-          image.addEventListener(
-            'load',
-            () => {
-              if (typeof image.decode === 'function') {
-                image.decode().catch(() => {}).finally(done);
-                return;
-              }
-
-              done();
-            },
-            { once: true }
-          );
-          image.addEventListener('error', done, { once: true });
-          image.src = url;
-
-          if (image.complete) {
-            if (typeof image.decode === 'function') {
-              image.decode().catch(() => {}).finally(done);
-              return;
-            }
-
-            done();
-          }
-        });
-      },
-      async preloadProgramImages() {
-        if (this.programImagesPreloaded) {
-          return;
-        }
-
-        this.programImagesPreloaded = true;
-
-        if (this.programPreloadObserver) {
-          this.programPreloadObserver.disconnect();
-          this.programPreloadObserver = null;
-        }
-
-        const urls = this.collectProgramImageUrls();
-
-        if (!urls.length) {
-          return;
-        }
-
-        const batchSize = 2;
-
-        for (let index = 0; index < urls.length; index += batchSize) {
-          const batch = urls.slice(index, index + batchSize);
-          await Promise.all(batch.map((url) => this.preloadImage(url)));
-
-          await new Promise((resolve) => {
-            window.requestAnimationFrame(() => {
-              resolve();
-            });
-          });
-        }
-
-        this.$nextTick(() => {
-          this.updateAllPanelHeights();
-        });
-      },
       getPanelContent(index) {
         const panelWrap = this.panelRefs[index];
 
@@ -314,13 +134,19 @@
       bindPanelMediaListeners(index) {
         const panelWrap = this.panelRefs[index];
 
-        if (!panelWrap || panelWrap.dataset.panelMediaBound === 'true') {
+        if (!panelWrap) {
           return;
         }
 
         const images = panelWrap.querySelectorAll('img');
 
         images.forEach((image) => {
+          if (image.dataset.panelMediaBound === 'true') {
+            return;
+          }
+
+          image.dataset.panelMediaBound = 'true';
+
           if (image.complete) {
             return;
           }
@@ -336,8 +162,6 @@
           image.addEventListener('load', recalc, { once: true });
           image.addEventListener('error', recalc, { once: true });
         });
-
-        panelWrap.dataset.panelMediaBound = 'true';
       },
       measurePanelHeight(index) {
         const panel = this.getPanelContent(index);
@@ -384,6 +208,9 @@
         return {
           '--panel-height': this.panelHeights[index] || '0px'
         };
+      },
+      shouldRenderGalleryImage(index) {
+        return this.isSwitching || this.activeWebinarIndex === index || this.animatingWebinarIndex === index;
       },
       parseDurationMs(raw, fallbackMs) {
         if (typeof raw !== 'string') {
@@ -716,6 +543,7 @@
         await this.$nextTick();
 
         if (openingIndex >= 0) {
+          this.bindPanelMediaListeners(openingIndex);
           this.updatePanelHeight(openingIndex);
         }
 
@@ -849,7 +677,14 @@
 
               <div class="program-card__gallery">
                 <figure class="program-card__figure" v-for="(img, imageIndex) in webinar.images" :key="webinar.title + img + imageIndex">
-                  <img :src="img" :alt="webinar.title" loading="lazy" decoding="async" data-fade-image />
+                  <img
+                    v-if="shouldRenderGalleryImage(webinarIndex)"
+                    :src="img"
+                    :alt="webinar.title"
+                    loading="eager"
+                    decoding="async"
+                    data-fade-image
+                  />
                 </figure>
               </div>
             </div>

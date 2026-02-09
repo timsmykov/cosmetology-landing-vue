@@ -37,15 +37,26 @@
     opacity var(--motion-duration-base) var(--motion-ease-out),
     transform var(--motion-duration-base) var(--motion-ease-out);
   transition-delay: var(--reveal-delay);
+  will-change: auto;
+}
+
+[data-reveal].reveal-ready:not(.is-inview) {
   will-change: opacity, transform;
 }
 
 [data-reveal].reveal-ready.is-inview {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
+  will-change: auto;
 }
 
 @media (max-width: 47.99em) {
+  :root {
+    --motion-duration-fast: 200ms;
+    --motion-duration-base: 320ms;
+    --motion-distance: 0.5rem;
+  }
+
   [data-reveal='left'],
   [data-reveal='right'] {
     --reveal-transform: translate3d(0, var(--motion-distance), 0);

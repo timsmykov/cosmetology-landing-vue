@@ -5,7 +5,8 @@
     name: 'App',
     data() {
       return {
-        showScrollTop: false
+        showScrollTop: false,
+        scrollFrameId: 0
       };
     },
     components: {
@@ -20,15 +21,33 @@
     },
     mounted() {
       window.addEventListener('scroll', this.handleScroll, { passive: true });
-      this.handleScroll();
+      this.updateScrollTopState();
     },
     beforeUnmount() {
       window.removeEventListener('scroll', this.handleScroll);
+      if (this.scrollFrameId) {
+        window.cancelAnimationFrame(this.scrollFrameId);
+        this.scrollFrameId = 0;
+      }
     },
     methods: {
-      handleScroll() {
+      updateScrollTopState() {
         const threshold = (window.innerHeight || document.documentElement.clientHeight || 1) * 0.6;
-        this.showScrollTop = window.scrollY > threshold;
+        const shouldShow = window.scrollY > threshold;
+
+        if (shouldShow !== this.showScrollTop) {
+          this.showScrollTop = shouldShow;
+        }
+      },
+      handleScroll() {
+        if (this.scrollFrameId) {
+          return;
+        }
+
+        this.scrollFrameId = window.requestAnimationFrame(() => {
+          this.scrollFrameId = 0;
+          this.updateScrollTopState();
+        });
       },
       scrollToTop() {
         window.scrollTo({

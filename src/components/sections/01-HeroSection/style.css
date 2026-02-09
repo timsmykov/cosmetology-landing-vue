@@ -146,9 +146,6 @@
 .hero__orb {
   position: absolute;
   border-radius: 999rem;
-  transform: translate3d(var(--orb-shift-x, 0), var(--orb-shift-y, 0), 0);
-  transition: transform 160ms linear;
-  will-change: transform;
   filter: blur(0.15rem);
 }
 
@@ -327,12 +324,5 @@
 
   .hero__btn {
     min-width: 14.5rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__orb {
-    transform: none;
-    transition: none;
   }
 }

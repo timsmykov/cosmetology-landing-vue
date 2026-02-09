@@ -13,14 +13,6 @@ import { resolveImageAsset } from './assets.js';
       primaryUrl: '#pricing-full-package',
       secondary: 'Выбрать отдельные вебинары'
     },
-    steps: [
-      'Шаг 1 из 6',
-      'Шаг 2 из 6',
-      'Шаг 3 из 6',
-      'Шаг 4 из 6',
-      'Шаг 5 из 6',
-      'Шаг 6 из 6'
-    ],
     mobileNote: 'Вам не нужен компьютер. Повторяйте за нами с телефона в реальном времени.',
     webinars: [
       {

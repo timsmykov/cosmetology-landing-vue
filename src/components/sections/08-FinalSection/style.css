@@ -35,10 +35,6 @@
   padding: clamp(0.86rem, 3vw, 1.2rem);
 }
 
-.final__alert.is-inview {
-  animation: finalAlertBreath 3200ms ease-in-out 780ms infinite;
-}
-
 .final__alert::before,
 .final__alert::after {
   z-index: 1;
@@ -47,42 +43,6 @@
 .final__alert > * {
   position: relative;
   z-index: 2;
-}
-
-.final__alert-smoke {
-  display: none;
-}
-
-.final__alert-smoke::before,
-.final__alert-smoke::after {
-  content: '';
-  position: absolute;
-  top: -12%;
-  bottom: -28%;
-  width: 44%;
-  opacity: 0;
-  transform: translate3d(0, 14%, 0) scale(0.94);
-  background:
-    radial-gradient(60% 52% at 35% 15%, rgba(255, 118, 156, 0.55) 0%, rgba(255, 118, 156, 0.26) 35%, transparent 70%),
-    radial-gradient(55% 55% at 45% 45%, rgba(255, 168, 194, 0.48) 0%, rgba(255, 168, 194, 0.2) 45%, transparent 72%),
-    radial-gradient(70% 60% at 50% 85%, rgba(255, 214, 228, 0.5) 0%, rgba(255, 214, 228, 0.18) 50%, transparent 78%);
-}
-
-.final__alert-smoke::before {
-  left: -18%;
-}
-
-.final__alert-smoke::after {
-  right: -18%;
-  transform: translate3d(0, 16%, 0) scale(0.92);
-}
-
-.final__alert.is-inview .final__alert-smoke::before {
-  animation: finalAlertSmokeLeft 12s ease-in-out 400ms infinite;
-}
-
-.final__alert.is-inview .final__alert-smoke::after {
-  animation: finalAlertSmokeRight 13.5s ease-in-out 1100ms infinite;
 }
 
 .final__alert::before {
@@ -277,68 +237,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .final__alert.is-inview,
-  .final__alert.is-inview .final__alert-smoke::before,
-  .final__alert.is-inview .final__alert-smoke::after {
-    animation: none;
-  }
-}
-
-@keyframes finalAlertBreath {
-  0%,
-  100% {
-    box-shadow:
-      0 1.1rem 2.2rem rgba(199, 58, 91, 0.16),
-      inset 0 0.0625rem 0 rgba(255, 255, 255, 0.86);
-  }
-
-  50% {
-    box-shadow:
-      0 1.3rem 2.5rem rgba(199, 58, 91, 0.22),
-      inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92);
-  }
-}
-
-@keyframes finalAlertSmokeLeft {
-  0% {
-    opacity: 0;
-    transform: translate3d(-6%, 16%, 0) scale(0.9);
-  }
-
-  45% {
-    opacity: 0.55;
-    transform: translate3d(-1%, 4%, 0) scale(1.03);
-  }
-
-  80% {
-    opacity: 0.28;
-    transform: translate3d(4%, -10%, 0) scale(1.1);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate3d(10%, -22%, 0) scale(1.16);
-  }
-}
-
-@keyframes finalAlertSmokeRight {
-  0% {
-    opacity: 0;
-    transform: translate3d(6%, 18%, 0) scale(0.9);
-  }
-
-  40% {
-    opacity: 0.5;
-    transform: translate3d(1%, 6%, 0) scale(1.02);
-  }
-
-  78% {
-    opacity: 0.24;
-    transform: translate3d(-4%, -8%, 0) scale(1.08);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate3d(-12%, -24%, 0) scale(1.16);
+  .final__alert::before {
+    opacity: 0.2;
   }
 }

@@ -21,7 +21,8 @@
         animatingExperts: {},
         switchingExperts: {},
         expertBodyRefs: {},
-        expertHeights: {}
+        expertHeights: {},
+        resizeFrameId: 0
       };
     },
     mounted() {
@@ -35,6 +36,10 @@
     },
     beforeUnmount() {
       window.removeEventListener('resize', this.handleResize);
+      if (this.resizeFrameId) {
+        window.cancelAnimationFrame(this.resizeFrameId);
+        this.resizeFrameId = 0;
+      }
     },
     methods: {
       nextTickAsync() {
@@ -123,8 +128,15 @@
         });
       },
       handleResize() {
-        this.syncViewportMode();
-        this.updateAllExpertHeights();
+        if (this.resizeFrameId) {
+          return;
+        }
+
+        this.resizeFrameId = window.requestAnimationFrame(() => {
+          this.resizeFrameId = 0;
+          this.syncViewportMode();
+          this.updateAllExpertHeights();
+        });
       },
       setExpertBodyRef(index, el) {
         if (!el) {

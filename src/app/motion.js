@@ -13,78 +13,6 @@
     return value;
   }
 
-  function initHeroParallax() {
-    const hero = document.querySelector('#hero .hero__surface');
-    const topOrb = hero && hero.querySelector('.hero__orb--top');
-    const bottomOrb = hero && hero.querySelector('.hero__orb--bottom');
-
-    if (!hero || !topOrb || !bottomOrb) {
-      return;
-    }
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (reducedMotion) {
-      return;
-    }
-
-    let isTicking = false;
-    const previousShifts = {
-      topX: '',
-      topY: '',
-      bottomX: '',
-      bottomY: ''
-    };
-
-    const setShift = (target, xVar, yVar, xValue, yValue) => {
-      if (previousShifts[xVar] !== xValue) {
-        target.style.setProperty('--orb-shift-x', xValue);
-        previousShifts[xVar] = xValue;
-      }
-
-      if (previousShifts[yVar] !== yValue) {
-        target.style.setProperty('--orb-shift-y', yValue);
-        previousShifts[yVar] = yValue;
-      }
-    };
-
-    const update = () => {
-      const rect = hero.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
-
-      if (rect.bottom < 0 || rect.top > viewportHeight) {
-        setShift(topOrb, 'topX', 'topY', '0px', '0px');
-        setShift(bottomOrb, 'bottomX', 'bottomY', '0px', '0px');
-        return;
-      }
-
-      const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
-      const centeredProgress = progress - 0.5;
-      const yShift = centeredProgress * 20;
-      const xShift = centeredProgress * 12;
-
-      setShift(topOrb, 'topX', 'topY', `${xShift.toFixed(2)}px`, `${(-yShift * 0.8).toFixed(2)}px`);
-      setShift(bottomOrb, 'bottomX', 'bottomY', `${(-xShift * 0.65).toFixed(2)}px`, `${(yShift * 0.55).toFixed(2)}px`);
-    };
-
-    const requestTick = () => {
-      if (isTicking) {
-        return;
-      }
-
-      isTicking = true;
-
-      window.requestAnimationFrame(() => {
-        update();
-        isTicking = false;
-      });
-    };
-
-    update();
-    window.addEventListener('scroll', requestTick, { passive: true });
-    window.addEventListener('resize', requestTick, { passive: true });
-  }
-
   function initFadeImages() {
     const images = Array.from(document.querySelectorAll('[data-fade-image]'));
 
@@ -206,7 +134,6 @@
 
     if (!revealItems.length) {
       initFadeImages();
-      initHeroParallax();
       return;
     }
 
@@ -223,9 +150,9 @@
     if (reducedMotion || !('IntersectionObserver' in window)) {
       revealItems.forEach((item) => {
         item.classList.add('is-inview');
+        item.style.removeProperty('will-change');
       });
       initFadeImages();
-      initHeroParallax();
       return;
     }
 
@@ -256,6 +183,7 @@
 
         if (isVisibleEnough) {
           item.classList.add('is-inview');
+          item.style.removeProperty('will-change');
           unresolvedItems.delete(item);
         }
       });
@@ -269,6 +197,9 @@
 
           if (entry.isIntersecting) {
             target.classList.add('is-inview');
+            if (!repeat) {
+              target.style.removeProperty('will-change');
+            }
 
             if (!repeat) {
               unresolvedItems.delete(target);
@@ -291,6 +222,7 @@
     });
 
     let isTicking = false;
+    let delayedCheckTimer = 0;
     const requestVisibleCheck = () => {
       if (!unresolvedItems.size) {
         return;
@@ -310,9 +242,14 @@
 
     scheduleVisibleChecks = () => {
       requestVisibleCheck();
-      [120, 280, 520].forEach((delay) => {
-        window.setTimeout(requestVisibleCheck, delay);
-      });
+      if (delayedCheckTimer) {
+        window.clearTimeout(delayedCheckTimer);
+      }
+
+      delayedCheckTimer = window.setTimeout(() => {
+        delayedCheckTimer = 0;
+        requestVisibleCheck();
+      }, 220);
     };
 
     const revealFallback = () => {
@@ -333,6 +270,7 @@
 
         if (shouldReveal) {
           item.classList.add('is-inview');
+          item.style.removeProperty('will-change');
           unresolvedItems.delete(item);
         }
       });
@@ -343,11 +281,10 @@
     window.addEventListener('orientationchange', requestVisibleCheck, { passive: true });
     window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('pageshow', scheduleVisibleChecks);
-    window.setTimeout(scheduleVisibleChecks, 420);
-    window.setTimeout(revealFallback, 1800);
+    window.setTimeout(scheduleVisibleChecks, 260);
+    window.setTimeout(revealFallback, 1200);
 
     initFadeImages();
-    initHeroParallax();
   }
 
   window.Landing = window.Landing || {};
