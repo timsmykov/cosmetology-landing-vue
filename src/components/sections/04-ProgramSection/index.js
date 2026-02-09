@@ -278,12 +278,18 @@
           }
 
           image.dataset.panelMediaBound = 'true';
+          const markLoaded = () => {
+            image.classList.add('is-loaded');
+          };
 
           if (image.complete) {
+            markLoaded();
             return;
           }
 
           const recalc = () => {
+            markLoaded();
+
             if (this.animatingWebinarIndex === index) {
               return;
             }
