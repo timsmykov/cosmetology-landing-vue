@@ -117,6 +117,10 @@
           return;
         }
 
+        if (this.journeyPointRefs[index] === el) {
+          return;
+        }
+
         this.journeyPointRefs[index] = el;
         this.scheduleJourneyLayout();
       },
@@ -247,6 +251,10 @@
       },
       setPanelRef(index, el) {
         if (!el) {
+          return;
+        }
+
+        if (this.panelRefs[index] === el) {
           return;
         }
 
