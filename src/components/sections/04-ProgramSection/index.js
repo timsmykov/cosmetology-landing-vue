@@ -385,19 +385,41 @@
           '--panel-height': this.panelHeights[index] || '0px'
         };
       },
-      getPanelDurationMs(index, phase = 'current') {
+      parseDurationMs(raw, fallbackMs) {
+        if (typeof raw !== 'string') {
+          return fallbackMs;
+        }
+
+        const normalized = raw.trim().toLowerCase();
+
+        if (!normalized) {
+          return fallbackMs;
+        }
+
+        if (normalized.endsWith('ms')) {
+          const numeric = Number.parseFloat(normalized.slice(0, -2).trim());
+          return Number.isFinite(numeric) ? Math.max(120, numeric) : fallbackMs;
+        }
+
+        if (normalized.endsWith('s')) {
+          const numeric = Number.parseFloat(normalized.slice(0, -1).trim());
+          return Number.isFinite(numeric) ? Math.max(120, Math.round(numeric * 1000)) : fallbackMs;
+        }
+
+        const numeric = Number.parseFloat(normalized);
+        return Number.isFinite(numeric) ? Math.max(120, numeric) : fallbackMs;
+      },
+      getMotionDurationMs(index, phase = 'open') {
         const card = this.getCardElement(index);
         const fallbackByPhase = {
-          current: 620,
-          open: 930,
+          open: 860,
           close: 520
         };
         const varByPhase = {
-          current: '--program-panel-duration',
           open: '--program-open-duration',
           close: '--program-close-duration'
         };
-        const normalizedPhase = Object.prototype.hasOwnProperty.call(varByPhase, phase) ? phase : 'current';
+        const normalizedPhase = Object.prototype.hasOwnProperty.call(varByPhase, phase) ? phase : 'open';
         const fallbackDuration = fallbackByPhase[normalizedPhase];
 
         if (!card) {
@@ -405,22 +427,87 @@
         }
 
         const raw = window.getComputedStyle(card).getPropertyValue(varByPhase[normalizedPhase]) || '';
-        const numeric = Number.parseFloat(raw.replace('ms', '').trim());
-        return Number.isFinite(numeric) ? Math.max(120, numeric) : fallbackDuration;
+        return this.parseDurationMs(raw, fallbackDuration);
       },
-      waitForPanelTransition(index, timeoutMs = null, phase = 'current') {
-        const panelWrap = this.getPanelWrap(index);
+      getProgramCards() {
+        const root = this.$el;
 
-        if (!panelWrap) {
+        if (!root || typeof root.querySelectorAll !== 'function') {
+          return [];
+        }
+
+        return Array.from(root.querySelectorAll('.program-card'));
+      },
+      captureProgramCardRects() {
+        const rects = new Map();
+
+        this.getProgramCards().forEach((card, index) => {
+          rects.set(index, card.getBoundingClientRect());
+        });
+
+        return rects;
+      },
+      animateProgramFlip(beforeRects, durationMs, easing = 'cubic-bezier(0.45, 0, 0.55, 1)') {
+        const cards = this.getProgramCards();
+
+        if (!cards.length || !beforeRects || !beforeRects.size || durationMs <= 0) {
           return Promise.resolve();
         }
 
-        const duration = this.getPanelDurationMs(index, phase);
-        const effectiveTimeout = Number.isFinite(timeoutMs) ? timeoutMs : Math.round(duration + 220);
+        const animatedCards = [];
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+        const maxFlipDistance = Math.max(160, Math.round(viewportHeight * 0.24));
+
+        cards.forEach((card, index) => {
+          const beforeRect = beforeRects.get(index);
+
+          if (!beforeRect) {
+            return;
+          }
+
+          const afterRect = card.getBoundingClientRect();
+          const deltaY = beforeRect.top - afterRect.top;
+
+          if (!Number.isFinite(deltaY) || Math.abs(deltaY) < 0.5) {
+            return;
+          }
+
+          if (Math.abs(deltaY) > maxFlipDistance) {
+            return;
+          }
+
+          card.style.transition = 'none';
+          card.style.transform = `translate3d(0, ${deltaY.toFixed(2)}px, 0)`;
+          card.style.willChange = 'transform';
+          animatedCards.push(card);
+        });
+
+        if (!animatedCards.length) {
+          return Promise.resolve();
+        }
 
         return new Promise((resolve) => {
           let finished = false;
+          let completed = 0;
           let timeoutId = 0;
+          const totalCards = cards.length;
+
+          cards.forEach((card, index) => {
+            // Keep paint order deterministic during FLIP:
+            // top cards always stay above lower cards while transforms are in flight.
+            card.style.zIndex = String(totalCards - index);
+          });
+
+          const cleanup = () => {
+            cards.forEach((card) => {
+              card.removeEventListener('transitionend', handleTransitionEnd);
+              card.style.transition = '';
+              card.style.transform = '';
+              card.style.willChange = '';
+              card.style.zIndex = '';
+            });
+            window.clearTimeout(timeoutId);
+          };
 
           const done = () => {
             if (finished) {
@@ -428,21 +515,36 @@
             }
 
             finished = true;
-            panelWrap.removeEventListener('transitionend', handleTransitionEnd);
-            window.clearTimeout(timeoutId);
+            cleanup();
             resolve();
           };
 
           const handleTransitionEnd = (event) => {
-            if (event.target !== panelWrap || event.propertyName !== 'height') {
+            if (!event || event.propertyName !== 'transform') {
               return;
             }
 
-            done();
+            completed += 1;
+
+            if (completed >= animatedCards.length) {
+              done();
+            }
           };
 
-          panelWrap.addEventListener('transitionend', handleTransitionEnd);
-          timeoutId = window.setTimeout(done, effectiveTimeout);
+          animatedCards.forEach((card) => {
+            // Ensure inverse transforms are committed before the animated frame.
+            card.getBoundingClientRect();
+          });
+
+          window.requestAnimationFrame(() => {
+            animatedCards.forEach((card) => {
+              card.addEventListener('transitionend', handleTransitionEnd);
+              card.style.transition = `transform ${Math.max(120, Math.round(durationMs))}ms ${easing}`;
+              card.style.transform = 'translate3d(0, 0, 0)';
+            });
+
+            timeoutId = window.setTimeout(done, Math.max(120, Math.round(durationMs)) + 96);
+          });
         });
       },
       getPanelHeightValue(index) {
@@ -450,144 +552,29 @@
         const numeric = Number.parseFloat(raw);
         return Number.isFinite(numeric) ? numeric : 0;
       },
-      ensurePanelHeight(index) {
-        if (this.getPanelHeightValue(index) > 0) {
-          return;
-        }
-
-        this.updatePanelHeight(index);
-      },
-      getScrollDuration(targetTop, index) {
+      getSyncDuration(targetTop, panelDuration) {
         const currentTop = window.scrollY || window.pageYOffset || 0;
         const distance = Math.abs(targetTop - currentTop);
-        const panelDuration = this.getPanelDurationMs(index);
-        const viewportHeight = this.getViewportHeight();
-        const distanceRatio = Math.min(1.4, distance / Math.max(1, viewportHeight));
-        const minDuration = Math.max(320, Math.round(panelDuration * 0.88));
-        const maxDuration = Math.max(minDuration + 140, Math.round(panelDuration * 1.55));
-        const distanceComponent = Math.round(distanceRatio * panelDuration * 0.52);
-        return Math.max(minDuration, Math.min(maxDuration, minDuration + distanceComponent));
+        const scrollVelocityPxMs = 2.6;
+        const distanceDuration = distance / scrollVelocityPxMs;
+        const minDuration = Math.max(420, Math.round(panelDuration * 0.92));
+        const maxDuration = Math.max(minDuration + 260, Math.round(panelDuration * 2.05));
+        const syncDuration = Math.max(panelDuration, distanceDuration);
+        return Math.max(minDuration, Math.min(maxDuration, Math.round(syncDuration)));
       },
-      getCubicBezierEasing(x1, y1, x2, y2) {
-        const cx = 3 * x1;
-        const bx = 3 * (x2 - x1) - cx;
-        const ax = 1 - cx - bx;
-        const cy = 3 * y1;
-        const by = 3 * (y2 - y1) - cy;
-        const ay = 1 - cy - by;
-        const sampleCurveX = (t) => ((ax * t + bx) * t + cx) * t;
-        const sampleCurveY = (t) => ((ay * t + by) * t + cy) * t;
-        const sampleCurveDerivativeX = (t) => (3 * ax * t + 2 * bx) * t + cx;
-        const solveCurveX = (x) => {
-          let t = x;
-
-          for (let i = 0; i < 8; i += 1) {
-            const xEstimate = sampleCurveX(t) - x;
-
-            if (Math.abs(xEstimate) < 0.00001) {
-              return t;
-            }
-
-            const derivative = sampleCurveDerivativeX(t);
-
-            if (Math.abs(derivative) < 0.000001) {
-              break;
-            }
-
-            t -= xEstimate / derivative;
-          }
-
-          let lower = 0;
-          let upper = 1;
-          t = x;
-
-          for (let i = 0; i < 12; i += 1) {
-            const xEstimate = sampleCurveX(t);
-
-            if (Math.abs(xEstimate - x) < 0.00001) {
-              return t;
-            }
-
-            if (xEstimate > x) {
-              upper = t;
-            } else {
-              lower = t;
-            }
-
-            t = (lower + upper) * 0.5;
-          }
-
-          return t;
-        };
-
-        return (value) => {
-          const progress = Math.max(0, Math.min(1, value));
-
-          if (progress === 0 || progress === 1) {
-            return progress;
-          }
-
-          return sampleCurveY(solveCurveX(progress));
-        };
+      getSyncEasing(progress) {
+        const clamped = Math.max(0, Math.min(1, progress));
+        return clamped < 0.5
+          ? 4 * clamped * clamped * clamped
+          : 1 - Math.pow(-2 * clamped + 2, 3) / 2;
       },
-      getPanelEasing(index, phase = 'current') {
-        const card = this.getCardElement(index);
-        const varByPhase = {
-          current: '--program-panel-ease',
-          open: '--program-open-ease',
-          close: '--program-close-ease'
-        };
-        const normalizedPhase = Object.prototype.hasOwnProperty.call(varByPhase, phase) ? phase : 'current';
-
-        if (!card) {
-          return (value) => value;
-        }
-
-        const raw = window.getComputedStyle(card).getPropertyValue(varByPhase[normalizedPhase]) || '';
-        const normalized = raw.trim().toLowerCase();
-        const keywordMap = {
-          linear: [0, 0, 1, 1],
-          ease: [0.25, 0.1, 0.25, 1],
-          'ease-in': [0.42, 0, 1, 1],
-          'ease-out': [0, 0, 0.58, 1],
-          'ease-in-out': [0.42, 0, 0.58, 1]
-        };
-
-        if (!normalized) {
-          return (value) => value;
-        }
-
-        if (Object.prototype.hasOwnProperty.call(keywordMap, normalized)) {
-          const [x1, y1, x2, y2] = keywordMap[normalized];
-          return this.getCubicBezierEasing(x1, y1, x2, y2);
-        }
-
-        const match = normalized.match(
-          /^cubic-bezier\(\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*\)$/
-        );
-
-        if (!match) {
-          return (value) => value;
-        }
-
-        const x1 = Number.parseFloat(match[1]);
-        const y1 = Number.parseFloat(match[2]);
-        const x2 = Number.parseFloat(match[3]);
-        const y2 = Number.parseFloat(match[4]);
-
-        if (![x1, y1, x2, y2].every((value) => Number.isFinite(value))) {
-          return (value) => value;
-        }
-
-        return this.getCubicBezierEasing(x1, y1, x2, y2);
-      },
-      animateScrollTo(targetTop, durationMs, options = {}) {
+      animateScrollTo(targetTop, durationMs, easingFn = (value) => this.getSyncEasing(value)) {
         const startTop = window.scrollY || window.pageYOffset || 0;
         const delta = targetTop - startTop;
 
         if (Math.abs(delta) < 1 || durationMs <= 0) {
           window.scrollTo(0, targetTop);
-          return;
+          return Promise.resolve();
         }
 
         if (typeof this.restoreScrollBehavior === 'function') {
@@ -607,87 +594,45 @@
           this.scrollFrameId = 0;
         }
 
-        const start = performance.now();
-        const easing = typeof options.easingFn === 'function'
-          ? options.easingFn
-          : options.easing === 'linear'
-          ? (value) => value
-          : (value) => 1 - Math.pow(1 - value, 3);
+        return new Promise((resolve) => {
+          const start = performance.now();
+          const tick = (now) => {
+            const elapsed = now - start;
+            const progress = Math.max(0, Math.min(1, elapsed / durationMs));
+            const eased = easingFn(progress);
+            const nextTop = startTop + (delta * eased);
+            window.scrollTo(0, nextTop);
 
-        const tick = (now) => {
-          const elapsed = now - start;
-          const progress = Math.max(0, Math.min(1, elapsed / durationMs));
-          const eased = easing(progress);
-          const nextTop = startTop + (delta * eased);
-          window.scrollTo(0, nextTop);
+            if (progress < 1) {
+              this.scrollFrameId = window.requestAnimationFrame(tick);
+              return;
+            }
 
-          if (progress < 1) {
-            this.scrollFrameId = window.requestAnimationFrame(tick);
-            return;
-          }
+            this.scrollFrameId = 0;
+            window.scrollTo(0, targetTop);
+            if (typeof this.restoreScrollBehavior === 'function') {
+              this.restoreScrollBehavior();
+              this.restoreScrollBehavior = null;
+            }
+            resolve();
+          };
 
-          this.scrollFrameId = 0;
-          window.scrollTo(0, targetTop);
-          if (typeof this.restoreScrollBehavior === 'function') {
-            this.restoreScrollBehavior();
-            this.restoreScrollBehavior = null;
-          }
-        };
-
-        this.scrollFrameId = window.requestAnimationFrame(tick);
+          this.scrollFrameId = window.requestAnimationFrame(tick);
+        });
       },
-      animateScrollToOnPanelStart(index, targetTop, durationMs, options = {}) {
-        const panelWrap = this.getPanelWrap(index);
-
-        if (!panelWrap) {
-          this.animateScrollTo(targetTop, durationMs, options);
-          return;
-        }
-
-        let started = false;
-        let fallbackId = 0;
-
-        const cleanup = () => {
-          panelWrap.removeEventListener('transitionrun', startIfHeightTransition);
-          panelWrap.removeEventListener('transitionstart', startIfHeightTransition);
-          window.clearTimeout(fallbackId);
-        };
-
-        const start = () => {
-          if (started) {
-            return;
-          }
-
-          started = true;
-          cleanup();
-          this.animateScrollTo(targetTop, durationMs, options);
-        };
-
-        const startIfHeightTransition = (event) => {
-          if (event.target !== panelWrap || event.propertyName !== 'height') {
-            return;
-          }
-
-          start();
-        };
-
-        panelWrap.addEventListener('transitionrun', startIfHeightTransition);
-        panelWrap.addEventListener('transitionstart', startIfHeightTransition);
-        fallbackId = window.setTimeout(start, 220);
-      },
-      focusCardInViewport(index, options = {}) {
+      resolveCardTargetTop(index, options = {}) {
         const card = this.getCardElement(index);
         const panelWrap = this.getPanelWrap(index);
 
         if (!card || !panelWrap) {
-          return;
+          return null;
         }
 
         const rect = card.getBoundingClientRect();
-        const rectTopOffset = Number.isFinite(options.rectTopOffset)
-          ? Number(options.rectTopOffset)
+        const predictedTopShift = Number.isFinite(options.predictedTopShift)
+          ? Number(options.predictedTopShift)
           : 0;
-        const predictedRectTop = rect.top + rectTopOffset;
+        const predictedRectTop = rect.top + predictedTopShift;
         const currentPanelHeight = Math.max(0, Math.round(panelWrap.getBoundingClientRect().height));
         const targetPanelHeight = Number.isFinite(options.targetPanelHeight)
           ? Math.max(0, Math.round(options.targetPanelHeight))
@@ -702,131 +647,101 @@
         const bottomPadding = Math.max(28, Math.round(viewportHeight * 0.12));
         const availableHeight = Math.max(1, viewportHeight - topPadding - bottomPadding);
         const fitsViewport = predictedCardHeight <= availableHeight;
-        let targetTop = currentTop;
         const predictedBottom = predictedRectTop + predictedCardHeight;
-        const topAlignedTarget = currentTop + predictedRectTop - topPadding;
-
         if (fitsViewport) {
-          targetTop = topAlignedTarget;
-        } else {
-          const preferredTop = topPadding;
-          const preferredBottom = viewportHeight - bottomPadding;
-          const needsAdjustment = predictedRectTop < preferredTop || predictedBottom > preferredBottom;
-
-          if (!needsAdjustment && !options.forceReposition) {
-            return;
-          }
-
-          const topAlignedTarget = currentTop + predictedRectTop - preferredTop;
-          const bottomAlignedTarget = currentTop + predictedBottom - preferredBottom;
-          if (predictedRectTop < preferredTop || options.preferTop !== false) {
-            targetTop = topAlignedTarget;
-          } else {
-            targetTop = bottomAlignedTarget;
-          }
+          return this.clampScrollTop(currentTop + predictedRectTop - topPadding, viewportHeight);
         }
 
-        targetTop = this.clampScrollTop(targetTop, viewportHeight);
-
-        if (Math.abs(targetTop - currentTop) < 6) {
-          return;
-        }
-
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (reducedMotion || options.behavior === 'auto') {
-          window.scrollTo(0, targetTop);
-          return;
-        }
-
-        const syncDurationMs = Number.isFinite(options.syncDurationMs)
-          ? Math.max(180, Math.round(options.syncDurationMs))
-          : null;
-        const duration = syncDurationMs || this.getScrollDuration(targetTop, index);
-
-        if (options.syncWithPanel) {
-          this.animateScrollToOnPanelStart(index, targetTop, duration, {
-            easingFn: options.syncEasingFn
-          });
-          return;
-        }
-
-        this.animateScrollTo(targetTop, duration);
+        const preferredBottom = viewportHeight - bottomPadding;
+        return this.clampScrollTop(currentTop + predictedBottom - preferredBottom, viewportHeight);
       },
-      async switchPanels(currentIndex, nextIndex) {
-        if (currentIndex < 0 || nextIndex < 0 || currentIndex === nextIndex) {
+      setRuntimeMotion(index, durationMs) {
+        const card = this.getCardElement(index);
+
+        if (!card) {
           return;
         }
 
-        this.updatePanelHeight(nextIndex);
+        card.style.setProperty('--program-panel-duration', `${Math.max(120, Math.round(durationMs))}ms`);
+        card.style.setProperty('--program-panel-ease', 'cubic-bezier(0.45, 0, 0.55, 1)');
+      },
+      resetRuntimeMotion(index) {
+        const card = this.getCardElement(index);
 
-        const targetPanelHeight = this.getPanelHeightValue(nextIndex);
-        const openDuration = this.getPanelDurationMs(nextIndex, 'open');
-        const openEasing = this.getPanelEasing(nextIndex, 'open');
-        const closeDuration = this.getPanelDurationMs(currentIndex, 'close');
-        const closingPanelWrap = this.getPanelWrap(currentIndex);
+        if (!card) {
+          return;
+        }
+
+        card.style.removeProperty('--program-panel-duration');
+        card.style.removeProperty('--program-panel-ease');
+      },
+      async runProgramTransition(currentIndex, nextIndex) {
+        const openingIndex = nextIndex >= 0 ? nextIndex : -1;
+        const closingIndex = currentIndex >= 0 && currentIndex !== nextIndex ? currentIndex : -1;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const beforeRects = this.captureProgramCardRects();
+
+        if (openingIndex >= 0) {
+          this.updatePanelHeight(openingIndex);
+        }
+
+        const targetPanelHeight = openingIndex >= 0 ? this.getPanelHeightValue(openingIndex) : 0;
+        const closingPanelWrap = closingIndex >= 0 ? this.getPanelWrap(closingIndex) : null;
         const closingPanelHeight = closingPanelWrap
           ? Math.max(0, Math.round(closingPanelWrap.getBoundingClientRect().height))
           : 0;
-        const rectTopOffset = nextIndex > currentIndex ? -closingPanelHeight : 0;
-        const closePromise = this.waitForPanelTransition(
-          currentIndex,
-          Math.round(closeDuration + 180),
-          'close'
-        );
-        const openPromise = this.waitForPanelTransition(
-          nextIndex,
-          Math.round(openDuration + 220),
-          'open'
-        );
+        const predictedTopShift = openingIndex > closingIndex ? -closingPanelHeight : 0;
+        const predictedTargetTop = openingIndex >= 0
+          ? this.resolveCardTargetTop(openingIndex, {
+              targetPanelHeight,
+              predictedTopShift
+            })
+          : null;
+        const baseDuration = openingIndex >= 0
+          ? this.getMotionDurationMs(openingIndex, 'open')
+          : this.getMotionDurationMs(closingIndex, 'close');
+        const syncDuration = reducedMotion
+          ? 0
+          : this.getSyncDuration(Number.isFinite(predictedTargetTop) ? predictedTargetTop : window.scrollY || 0, baseDuration);
+        const affected = [openingIndex, closingIndex].filter((index, position, list) => {
+          return index >= 0 && list.indexOf(index) === position;
+        });
 
-        this.animatingWebinarIndex = nextIndex;
+        affected.forEach((index) => {
+          this.setRuntimeMotion(index, syncDuration || baseDuration);
+        });
+
+        this.animatingWebinarIndex = openingIndex >= 0 ? openingIndex : closingIndex;
         this.activeWebinarIndex = nextIndex;
-        this.focusCardInViewport(nextIndex, {
-          behavior: 'smooth',
-          targetPanelHeight,
-          syncDurationMs: openDuration,
-          syncWithPanel: true,
-          syncEasingFn: openEasing,
-          forceReposition: true,
-          rectTopOffset
-        });
+        await this.$nextTick();
 
-        await Promise.all([closePromise, openPromise]);
-        this.animatingWebinarIndex = -1;
-      },
-      async closePanel(index) {
-        if (index < 0) {
+        if (openingIndex >= 0) {
+          this.updatePanelHeight(openingIndex);
+        }
+
+        const targetTop = openingIndex >= 0
+          ? this.resolveCardTargetTop(openingIndex, {
+              targetPanelHeight: this.getPanelHeightValue(openingIndex)
+            })
+          : null;
+
+        if (reducedMotion) {
+          if (Number.isFinite(targetTop)) {
+            window.scrollTo(0, targetTop);
+          }
+          this.animatingWebinarIndex = -1;
+          affected.forEach((index) => this.resetRuntimeMotion(index));
           return;
         }
 
-        const closeDuration = this.getPanelDurationMs(index, 'close');
-        const transitionPromise = this.waitForPanelTransition(index, Math.round(closeDuration + 180), 'close');
-        this.animatingWebinarIndex = index;
-        this.activeWebinarIndex = -1;
-        await transitionPromise;
-        this.animatingWebinarIndex = -1;
-      },
-      async openPanel(index) {
-        if (index < 0) {
-          return;
-        }
+        const flipPromise = this.animateProgramFlip(beforeRects, syncDuration);
+        const scrollPromise = Number.isFinite(targetTop)
+          ? this.animateScrollTo(targetTop, syncDuration)
+          : Promise.resolve();
 
-        this.updatePanelHeight(index);
-        const targetPanelHeight = this.getPanelHeightValue(index);
-        const panelDuration = this.getPanelDurationMs(index, 'open');
-        const panelEasing = this.getPanelEasing(index, 'open');
-        const transitionPromise = this.waitForPanelTransition(index, Math.round(panelDuration + 220), 'open');
-        this.animatingWebinarIndex = index;
-        this.activeWebinarIndex = index;
-        this.focusCardInViewport(index, {
-          behavior: 'smooth',
-          targetPanelHeight,
-          syncDurationMs: panelDuration,
-          syncWithPanel: true,
-          syncEasingFn: panelEasing
-        });
-        await transitionPromise;
+        await Promise.all([flipPromise, scrollPromise]);
         this.animatingWebinarIndex = -1;
+        affected.forEach((index) => this.resetRuntimeMotion(index));
       },
       async toggleWebinar(index) {
         if (this.isSwitching) {
@@ -837,19 +752,8 @@
 
         try {
           const current = this.activeWebinarIndex;
-          const closeOnly = current === index;
-
-          if (current >= 0 && closeOnly) {
-            await this.closePanel(current);
-            return;
-          }
-
-          if (current >= 0) {
-            await this.switchPanels(current, index);
-            return;
-          }
-
-          await this.openPanel(index);
+          const next = current === index ? -1 : index;
+          await this.runProgramTransition(current, next);
         } finally {
           this.isSwitching = false;
         }
