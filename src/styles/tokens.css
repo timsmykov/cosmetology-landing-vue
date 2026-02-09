@@ -10,6 +10,9 @@
   --radius: 20px;
   --container: 1120px;
   --shadow: 0 16px 40px rgba(199, 58, 91, 0.12);
+  --motion-fast: 160ms;
+  --motion-base: 240ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 * {
@@ -79,30 +82,77 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  position: relative;
+  border: 0.0625rem solid transparent;
   border-radius: 14px;
   padding: 13px 22px;
   font-weight: 700;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    transform var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard),
+    border-color var(--motion-base) var(--ease-standard),
+    background-color var(--motion-base) var(--ease-standard),
+    color var(--motion-base) var(--ease-standard),
+    opacity var(--motion-base) var(--ease-standard);
 }
 
 .btn:focus-visible {
   box-shadow: 0 0 0 3px rgba(199, 58, 91, 0.25);
 }
 
+.btn:active {
+  transform: translateY(0) scale(0.985);
+}
+
 .btn--primary {
   color: #fff;
-  background: linear-gradient(45deg, #c73a5b 0%, #ff5e7e 55%, #ff957a 100%);
+  border-color: rgba(173, 46, 77, 0.34);
+  background: linear-gradient(138deg, #c94164 0%, #ff5f81 58%, #ff7f84 100%);
   box-shadow: 0 12px 26px rgba(199, 58, 91, 0.25);
 }
 
 .btn--ghost {
   color: var(--accent-dark);
-  border: 1px solid #f7a7bb;
+  border-color: #f7a7bb;
   background: #fff;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.58;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    transform: translateY(-0.125rem);
+  }
+
+  .btn:hover:active {
+    transform: translateY(0.0625rem) scale(0.98);
+  }
+
+  .btn--primary:hover {
+    box-shadow: 0 16px 28px rgba(199, 58, 91, 0.3);
+  }
+
+  .btn--ghost:hover {
+    border-color: rgba(199, 58, 91, 0.52);
+    background: #fff5f8;
+  }
+}
+
+.btn--primary:active {
+  box-shadow: 0 8px 18px rgba(199, 58, 91, 0.24);
+}
+
+.btn--ghost:active {
+  background: #ffedf3;
+  border-color: rgba(199, 58, 91, 0.42);
 }
 
 .scroll-top {
@@ -161,6 +211,14 @@ button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .btn {
+    transition: none;
+  }
+
+  .btn:active {
+    transform: none;
   }
 }
 

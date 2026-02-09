@@ -133,27 +133,7 @@
 }
 
 .hero__btn {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
   min-height: 2.95rem;
-}
-
-.hero__btn.btn--primary::after {
-  content: '';
-  position: absolute;
-  top: -24%;
-  left: -125%;
-  width: 52%;
-  height: 160%;
-  transform: skewX(-24deg);
-  background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.hero__surface.is-inview .hero__btn.btn--primary::after {
-  animation: heroSheen 1.05s ease-out 0.52s 1 both;
 }
 
 .hero__meta {
@@ -198,29 +178,9 @@
   }
 }
 
-@keyframes heroSheen {
-  from {
-    opacity: 0;
-    transform: translateX(0) skewX(-24deg);
-  }
-
-  30% {
-    opacity: 0.88;
-  }
-
-  to {
-    opacity: 0;
-    transform: translateX(360%) skewX(-24deg);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hero__orb {
     transform: none;
     transition: none;
-  }
-
-  .hero__surface.is-inview .hero__btn.btn--primary::after {
-    animation: none;
   }
 }

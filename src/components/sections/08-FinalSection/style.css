@@ -163,10 +163,6 @@
   min-height: 2.95rem;
 }
 
-.final__actions.is-inview .final__btn.btn--primary {
-  animation: finalCtaNudge 560ms ease-out 1500ms 1 both;
-}
-
 .final__meta {
   margin: 0;
   color: #a34164;
@@ -189,7 +185,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .final__alert.is-inview,
-  .final__actions.is-inview .final__btn.btn--primary,
   .final__alert.is-inview .final__alert-smoke::before,
   .final__alert.is-inview .final__alert-smoke::after {
     animation: none;
@@ -252,19 +247,5 @@
   100% {
     opacity: 0;
     transform: translate3d(-12%, -24%, 0) scale(1.16);
-  }
-}
-
-@keyframes finalCtaNudge {
-  0% {
-    transform: translateY(0);
-  }
-
-  40% {
-    transform: translateY(-0.16rem);
-  }
-
-  100% {
-    transform: translateY(0);
   }
 }
