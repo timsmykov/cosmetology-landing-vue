@@ -9,11 +9,20 @@ import { resolveImageAsset } from './assets.js';
     text:
       'Как косметологу применять ИИ в рабочих задачах — быстро, безопасно и эффективно. Каждый вебинар — это новый слой вашей системы.',
     actions: {
-      primary: 'Купить пакет со скидкой',
+      primary: 'Занять место',
       primaryUrl: '#pricing-full-package',
-      secondary: 'Выбрать отдельные вебинары'
+      secondary: 'Выбрать вебинар'
     },
     mobileNote: 'Вам не нужен компьютер. Повторяйте за нами с телефона в реальном времени.',
+    journeyMessages: [
+      'Давайте посмотрим, как изменится ваш профиль шаг за шагом',
+      'Вы собрали свои первые публикации, но этого мало....',
+      'Теперь у вас есть Личный ассистент, но лента всё ещё выглядит разрозненно. Пора собрать единый дорогой стиль.',
+      'Ваш профиль выглядит как глянец. Но для охватов нужна динамика. Оживим картинку?',
+      'Охваты растут, но вы не можете снимать 24/7. Пусть в сторис работает ваш цифровой двойник.',
+      'Внимание есть, лайки есть. Теперь самое главное: превращаем это внимание в деньги и записи.',
+      'Система собрана. Вы больше не тратите время на контент, а получаете заявки.'
+    ],
     webinars: [
       {
         step: 'Шаг 1 из 6',
@@ -27,10 +36,7 @@ import { resolveImageAsset } from './assets.js';
           'Работать в простых ИИ-программах: 3 кнопки для профессионального результата.',
           'Писать посты без усилий: инструкции для готовых текстов.'
         ],
-        images: [
-          resolveImageAsset('program-collapsed/webinar-1.webp'),
-          resolveImageAsset('program-expanded/webinar-1.webp')
-        ]
+        images: [resolveImageAsset('program-expanded/webinar-1.webp')]
       },
       {
         step: 'Шаг 2 из 6',
@@ -44,10 +50,7 @@ import { resolveImageAsset } from './assets.js';
           'Формировать стратегии и проводить исследования.',
           'Строить серии контента на недели вперёд.'
         ],
-        images: [
-          resolveImageAsset('program-collapsed/webinar-2.webp'),
-          resolveImageAsset('program-expanded/webinar-2.webp')
-        ]
+        images: [resolveImageAsset('program-collapsed/webinar-2.webp')]
       },
       {
         step: 'Шаг 3 из 6',
@@ -61,10 +64,7 @@ import { resolveImageAsset } from './assets.js';
           'Убирать эффект "дешевого ИИ".',
           'Профессионально работать со светом, тенями и реалистичностью.'
         ],
-        images: [
-          resolveImageAsset('program-collapsed/webinar-3.webp'),
-          resolveImageAsset('program-expanded/webinar-3.webp')
-        ]
+        images: [resolveImageAsset('program-expanded/webinar-3.webp')]
       },
       {
         step: 'Шаг 4 из 6',
@@ -78,10 +78,7 @@ import { resolveImageAsset } from './assets.js';
           'Генерировать видео по текстовому описанию.',
           'Вставлять музыку, эффекты и субтитры автоматически.'
         ],
-        images: [
-          resolveImageAsset('program-collapsed/webinar-4.webp'),
-          resolveImageAsset('program-expanded/webinar-4.webp')
-        ]
+        images: [resolveImageAsset('program-collapsed/webinar-4.webp')]
       },
       {
         step: 'Шаг 5 из 6',
@@ -95,10 +92,7 @@ import { resolveImageAsset } from './assets.js';
           'Превращать тексты в живые видео с вашим голосом.',
           'Масштабировать контент без постоянных съёмок.'
         ],
-        images: [
-          resolveImageAsset('program-collapsed/webinar-5.webp'),
-          resolveImageAsset('program-expanded/webinar-5.webp')
-        ]
+        images: [resolveImageAsset('program-expanded/webinar-5.webp')]
       },
       {
         step: 'Шаг 6 из 6',
@@ -112,10 +106,7 @@ import { resolveImageAsset } from './assets.js';
           'Использовать скрипты и ответы в Direct с помощью ИИ.',
           'Вести учёт и аналитику: лиды, конверсия, улучшение результата.'
         ],
-        images: [
-          resolveImageAsset('program-collapsed/webinar-6.webp'),
-          resolveImageAsset('program-expanded/webinar-6.webp')
-        ]
+        images: [resolveImageAsset('program-collapsed/webinar-6.webp')]
       }
     ]
   };

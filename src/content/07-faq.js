@@ -34,7 +34,7 @@
       text: 'Остались вопросы? Задайте их в Telegram-боте.',
       supportAction: 'Задать вопрос',
       supportUrl: 'https://t.me/aicosmetologybot',
-      buyAction: 'Купить пакет'
+      buyAction: 'Занять место'
     }
   };
 })();

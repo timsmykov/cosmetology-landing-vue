@@ -68,11 +68,6 @@
             </li>
           </ul>
 
-          <div class="hero__aux" data-reveal data-reveal-delay="290">
-            <p class="hero__aux-label">AI + Instagram</p>
-            <p class="hero__aux-title">Система для косметолога</p>
-          </div>
-
           <div class="hero__actions" data-reveal data-reveal-delay="320">
             <a class="btn btn--primary hero__btn" href="#pricing">{{ hero.actions.primary }}</a>
             <a class="btn btn--ghost hero__btn" href="#program">{{ hero.actions.secondary }}</a>
@@ -82,7 +77,6 @@
         </div>
       </div>
 
-      <div class="hero__orb hero__orb--top" aria-hidden="true"></div>
     </div>
   </div>
 </section>

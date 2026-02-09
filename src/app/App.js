@@ -11,13 +11,14 @@
     },
     components: {
       HeroSection: components.HeroSection,
+      SelfCheckSection: components.SelfCheckSection,
       PositioningSection: components.PositioningSection,
-      TeamSection: components.TeamSection,
       ProgramSection: components.ProgramSection,
+      ProgramCtaSection: components.ProgramCtaSection,
+      TeamSection: components.TeamSection,
       PricingSection: components.PricingSection,
       FormatSection: components.FormatSection,
-      FaqSection: components.FaqSection,
-      FinalSection: components.FinalSection
+      FaqSection: components.FaqSection
     },
     mounted() {
       window.addEventListener('scroll', this.handleScroll, { passive: true });
@@ -59,13 +60,14 @@
     template: `
 <div class="landing-page">
   <HeroSection />
+  <SelfCheckSection />
   <PositioningSection />
-  <TeamSection />
   <ProgramSection />
+  <ProgramCtaSection />
+  <TeamSection />
   <PricingSection />
   <FormatSection />
   <FaqSection />
-  <FinalSection />
 
   <button
     class="scroll-top"

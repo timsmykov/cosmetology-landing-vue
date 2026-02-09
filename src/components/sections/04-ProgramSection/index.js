@@ -13,7 +13,9 @@
           primaryUrl: '#pricing',
           secondary: ''
         },
+        steps: [],
         mobileNote: '',
+        journeyMessages: [],
         webinars: [],
         ...source,
         actions: {
@@ -27,11 +29,7 @@
       const webinars = Array.isArray(program.webinars)
         ? program.webinars.map((webinar, index, list) => {
             const rawImages = Array.isArray(webinar && webinar.images) ? webinar.images.filter(Boolean) : [];
-            const normalizedImages = rawImages.length >= 2
-              ? rawImages.slice(0, 2)
-              : rawImages.length === 1
-              ? [rawImages[0], rawImages[0]]
-              : ['', ''];
+            const normalizedImages = rawImages.length ? rawImages.slice(0, 1) : [];
             const learn = Array.isArray(webinar && webinar.learn) ? webinar.learn : [];
 
             return {
@@ -40,7 +38,7 @@
               date: webinar && webinar.date ? webinar.date : '',
               text: webinar && webinar.text ? webinar.text : '',
               learn,
-              previewImage: webinar && webinar.previewImage ? webinar.previewImage : normalizedImages[0],
+              previewImage: webinar && webinar.previewImage ? webinar.previewImage : normalizedImages[0] || '',
               images: normalizedImages
             };
           })
@@ -54,8 +52,15 @@
         webinars,
         panelRefs: {},
         panelHeights: {},
+        journeyPointRefs: {},
+        journeyPath: '',
+        journeyViewWidth: 0,
+        journeyViewHeight: 0,
+        journeyStartDot: null,
+        journeyEndDot: null,
         resizeFrameId: 0,
         scrollFrameId: 0,
+        journeyFrameId: 0,
         restoreScrollBehavior: null
       };
     },
@@ -63,6 +68,7 @@
       window.addEventListener('resize', this.handleResize, { passive: true });
       this.$nextTick(() => {
         this.updateAllPanelHeights();
+        this.scheduleJourneyLayout();
       });
     },
     beforeUnmount() {
@@ -75,12 +81,128 @@
         window.cancelAnimationFrame(this.scrollFrameId);
         this.scrollFrameId = 0;
       }
+      if (this.journeyFrameId) {
+        window.cancelAnimationFrame(this.journeyFrameId);
+        this.journeyFrameId = 0;
+      }
       if (typeof this.restoreScrollBehavior === 'function') {
         this.restoreScrollBehavior();
         this.restoreScrollBehavior = null;
       }
     },
     methods: {
+      getJourneyMessages() {
+        const source = Array.isArray(this.program && this.program.journeyMessages)
+          ? this.program.journeyMessages
+          : [];
+
+        return source
+          .map((item) => (typeof item === 'string' ? item.trim() : ''))
+          .filter(Boolean);
+      },
+      getJourneyMessage(index) {
+        const messages = this.getJourneyMessages();
+        return index >= 0 && index < messages.length ? messages[index] : '';
+      },
+      hasJourneyMessage(index) {
+        return Boolean(this.getJourneyMessage(index));
+      },
+      getJourneyLabelClass(index) {
+        return index % 2 === 0
+          ? 'program__journey-item program__journey-item--left'
+          : 'program__journey-item program__journey-item--right';
+      },
+      setJourneyPointRef(index, el) {
+        if (!el) {
+          return;
+        }
+
+        this.journeyPointRefs[index] = el;
+        this.scheduleJourneyLayout();
+      },
+      buildJourneyPath(points) {
+        if (!Array.isArray(points) || points.length < 2) {
+          return '';
+        }
+
+        let path = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
+
+        for (let index = 1; index < points.length; index += 1) {
+          const previous = points[index - 1];
+          const current = points[index];
+          const controlY = previous.y + ((current.y - previous.y) / 2);
+          path += ` C ${previous.x.toFixed(2)} ${controlY.toFixed(2)}, ${current.x.toFixed(2)} ${controlY.toFixed(2)}, ${current.x.toFixed(2)} ${current.y.toFixed(2)}`;
+        }
+
+        return path;
+      },
+      getJourneySvgStyle() {
+        return {
+          height: `${Math.max(0, Math.ceil(this.journeyViewHeight || 0))}px`
+        };
+      },
+      getJourneyViewBox() {
+        return `0 0 ${Math.max(1, Math.ceil(this.journeyViewWidth || 1))} ${Math.max(1, Math.ceil(this.journeyViewHeight || 1))}`;
+      },
+      scheduleJourneyLayout() {
+        if (this.journeyFrameId) {
+          window.cancelAnimationFrame(this.journeyFrameId);
+        }
+
+        this.journeyFrameId = window.requestAnimationFrame(() => {
+          this.journeyFrameId = 0;
+          this.updateJourneyLayout();
+        });
+      },
+      updateJourneyLayout() {
+        const host = this.$refs.journeyHost;
+
+        if (!host || typeof host.getBoundingClientRect !== 'function') {
+          this.journeyPath = '';
+          this.journeyStartDot = null;
+          this.journeyEndDot = null;
+          this.journeyViewWidth = 0;
+          this.journeyViewHeight = 0;
+          return;
+        }
+
+        const hostRect = host.getBoundingClientRect();
+        const messages = this.getJourneyMessages();
+        const points = [];
+
+        messages.forEach((_, index) => {
+          const point = this.journeyPointRefs[index];
+
+          if (!point || typeof point.getBoundingClientRect !== 'function') {
+            return;
+          }
+
+          const pointRect = point.getBoundingClientRect();
+          const y = Math.max(0, (pointRect.top - hostRect.top) + (pointRect.height / 2));
+          const xRatio = index % 2 === 0 ? 0.22 : 0.78;
+          const x = Math.max(0, hostRect.width * xRatio);
+
+          points.push({ x, y });
+        });
+
+        if (points.length < 2) {
+          this.journeyPath = '';
+          this.journeyStartDot = null;
+          this.journeyEndDot = null;
+          this.journeyViewWidth = Math.max(0, Math.ceil(hostRect.width || 0));
+          this.journeyViewHeight = Math.max(0, Math.ceil(host.scrollHeight || 0));
+          return;
+        }
+
+        this.journeyPath = this.buildJourneyPath(points);
+        this.journeyStartDot = points[0];
+        this.journeyEndDot = points[points.length - 1];
+        this.journeyViewWidth = Math.max(0, Math.ceil(hostRect.width || 0));
+        this.journeyViewHeight = Math.max(
+          Math.ceil((points[points.length - 1].y || 0) + 24),
+          Math.ceil(host.scrollHeight || 0)
+        );
+      },
       getPanelContent(index) {
         const panelWrap = this.panelRefs[index];
 
@@ -120,6 +242,7 @@
         this.resizeFrameId = window.requestAnimationFrame(() => {
           this.resizeFrameId = 0;
           this.updateAllPanelHeights();
+          this.scheduleJourneyLayout();
         });
       },
       setPanelRef(index, el) {
@@ -130,6 +253,7 @@
         this.panelRefs[index] = el;
         this.bindPanelMediaListeners(index);
         this.updatePanelHeight(index);
+        this.scheduleJourneyLayout();
       },
       bindPanelMediaListeners(index) {
         const panelWrap = this.panelRefs[index];
@@ -157,6 +281,7 @@
             }
 
             this.updatePanelHeight(index);
+            this.scheduleJourneyLayout();
           };
 
           image.addEventListener('load', recalc, { once: true });
@@ -183,6 +308,7 @@
         this.webinars.forEach((_, index) => {
           this.updatePanelHeight(index);
         });
+        this.scheduleJourneyLayout();
       },
       getViewportHeight() {
         const visualViewport = window.visualViewport;
@@ -559,6 +685,7 @@
           }
           this.animatingWebinarIndex = -1;
           affected.forEach((index) => this.resetRuntimeMotion(index));
+          this.scheduleJourneyLayout();
           return;
         }
 
@@ -570,6 +697,7 @@
         await Promise.all([flipPromise, scrollPromise]);
         this.animatingWebinarIndex = -1;
         affected.forEach((index) => this.resetRuntimeMotion(index));
+        this.scheduleJourneyLayout();
       },
       async toggleWebinar(index) {
         if (this.isSwitching) {
@@ -609,88 +737,114 @@
         <p class="section-text program__text" data-reveal data-reveal-delay="160">{{ program.text }}</p>
       </header>
 
-      <div class="program__actions" data-reveal data-reveal-delay="220">
-        <a
-          class="btn btn--primary program__btn"
-          :href="program.actions.primaryUrl"
-          :target="program.actions.primaryUrl && program.actions.primaryUrl.indexOf('http') === 0 ? '_blank' : null"
-          :rel="program.actions.primaryUrl && program.actions.primaryUrl.indexOf('http') === 0 ? 'noopener noreferrer' : null"
-        >
-          {{ program.actions.primary }}
-        </a>
-        <a class="btn btn--ghost program__btn" href="#pricing">{{ program.actions.secondary }}</a>
+      <div class="program__list" ref="journeyHost">
+        <svg v-if="journeyPath" class="program__journey-svg" :style="getJourneySvgStyle()" :viewBox="getJourneyViewBox()" preserveAspectRatio="none" aria-hidden="true">
+          <path class="program__journey-path" :d="journeyPath" />
+          <circle
+            v-if="journeyStartDot"
+            class="program__journey-dot"
+            :cx="journeyStartDot.x"
+            :cy="journeyStartDot.y"
+            r="10"
+          />
+          <circle
+            v-if="journeyEndDot"
+            class="program__journey-dot"
+            :cx="journeyEndDot.x"
+            :cy="journeyEndDot.y"
+            r="10"
+          />
+        </svg>
+
+        <template v-for="(webinar, webinarIndex) in webinars" :key="webinar.title + webinarIndex">
+          <div
+            v-if="webinarIndex === 0 && hasJourneyMessage(0)"
+            :class="getJourneyLabelClass(0)"
+            :ref="(el) => setJourneyPointRef(0, el)"
+            data-reveal
+            data-reveal-delay="80"
+          >
+            <p class="program__journey-text">{{ getJourneyMessage(0) }}</p>
+          </div>
+
+          <article
+            class="program-card"
+            :class="{
+              'program-card--open': isWebinarOpen(webinarIndex),
+              'program-card--animating': animatingWebinarIndex === webinarIndex
+            }"
+            data-reveal
+            :data-reveal-delay="110 + (webinarIndex * 40)"
+          >
+            <button
+              class="program-card__toggle"
+              type="button"
+              :id="getWebinarButtonId(webinarIndex)"
+              :aria-expanded="isWebinarOpen(webinarIndex) ? 'true' : 'false'"
+              :aria-controls="getWebinarPanelId(webinarIndex)"
+              @click="toggleWebinar(webinarIndex)"
+            >
+              <div class="program-card__preview">
+                <div class="program-card__content">
+                  <span class="program-card__step">{{ webinar.stepLabel }}</span>
+                  <span class="program-card__date">{{ webinar.date }}</span>
+                  <span class="program-card__title">{{ getCardTitle(webinar.title) }}</span>
+                </div>
+
+                <figure class="program-card__thumb" aria-hidden="true">
+                  <img :src="webinar.previewImage" :alt="webinar.title" loading="lazy" decoding="async" data-fade-image />
+                </figure>
+              </div>
+
+              <span class="program-card__icon" aria-hidden="true"></span>
+            </button>
+
+            <div
+              class="program-card__panel-wrap"
+              :class="{ 'program-card__panel-wrap--open': isWebinarOpen(webinarIndex) }"
+              :style="getPanelStyle(webinarIndex)"
+              :ref="(el) => setPanelRef(webinarIndex, el)"
+              :id="getWebinarPanelId(webinarIndex)"
+              role="region"
+              :aria-labelledby="getWebinarButtonId(webinarIndex)"
+              :aria-hidden="isWebinarOpen(webinarIndex) ? 'false' : 'true'"
+            >
+              <div class="program-card__panel">
+                <p class="program-card__text">{{ webinar.text }}</p>
+                <h4>Чему вы научитесь:</h4>
+                <ul>
+                  <li v-for="(item, itemIndex) in webinar.learn" :key="webinar.title + item + itemIndex">{{ item }}</li>
+                </ul>
+
+                <div v-if="webinar.images.length" class="program-card__gallery">
+                  <figure class="program-card__figure">
+                    <img
+                      v-if="shouldRenderGalleryImage(webinarIndex)"
+                      :src="webinar.images[0]"
+                      :alt="webinar.title"
+                      loading="eager"
+                      decoding="async"
+                      data-fade-image
+                    />
+                  </figure>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div
+            v-if="hasJourneyMessage(webinarIndex + 1)"
+            :class="getJourneyLabelClass(webinarIndex + 1)"
+            :ref="(el) => setJourneyPointRef(webinarIndex + 1, el)"
+            data-reveal
+            :data-reveal-delay="140 + (webinarIndex * 40)"
+          >
+            <p class="program__journey-text">{{ getJourneyMessage(webinarIndex + 1) }}</p>
+          </div>
+        </template>
       </div>
 
       <p class="program__mobile-note" data-reveal data-reveal-delay="360">{{ program.mobileNote }}</p>
-
-      <div class="program__list">
-        <article
-          class="program-card"
-          :class="{
-            'program-card--open': isWebinarOpen(webinarIndex),
-            'program-card--animating': animatingWebinarIndex === webinarIndex
-          }"
-          v-for="(webinar, webinarIndex) in webinars"
-          :key="webinar.title + webinarIndex"
-          data-reveal
-          :data-reveal-delay="80 + (webinarIndex * 40)"
-        >
-          <button
-            class="program-card__toggle"
-            type="button"
-            :id="getWebinarButtonId(webinarIndex)"
-            :aria-expanded="isWebinarOpen(webinarIndex) ? 'true' : 'false'"
-            :aria-controls="getWebinarPanelId(webinarIndex)"
-            @click="toggleWebinar(webinarIndex)"
-          >
-            <div class="program-card__preview">
-              <div class="program-card__content">
-                <span class="program-card__step">{{ webinar.stepLabel }}</span>
-                <span class="program-card__date">{{ webinar.date }}</span>
-                <span class="program-card__title">{{ getCardTitle(webinar.title) }}</span>
-              </div>
-
-              <figure class="program-card__thumb" aria-hidden="true">
-                <img :src="webinar.previewImage" :alt="webinar.title" loading="lazy" decoding="async" data-fade-image />
-              </figure>
-            </div>
-
-            <span class="program-card__icon" aria-hidden="true"></span>
-          </button>
-
-          <div
-            class="program-card__panel-wrap"
-            :class="{ 'program-card__panel-wrap--open': isWebinarOpen(webinarIndex) }"
-            :style="getPanelStyle(webinarIndex)"
-            :ref="(el) => setPanelRef(webinarIndex, el)"
-            :id="getWebinarPanelId(webinarIndex)"
-            role="region"
-            :aria-labelledby="getWebinarButtonId(webinarIndex)"
-            :aria-hidden="isWebinarOpen(webinarIndex) ? 'false' : 'true'"
-          >
-            <div class="program-card__panel">
-              <p class="program-card__text">{{ webinar.text }}</p>
-              <h4>Чему вы научитесь:</h4>
-              <ul>
-                <li v-for="(item, itemIndex) in webinar.learn" :key="webinar.title + item + itemIndex">{{ item }}</li>
-              </ul>
-
-              <div class="program-card__gallery">
-                <figure class="program-card__figure" v-for="(img, imageIndex) in webinar.images" :key="webinar.title + img + imageIndex">
-                  <img
-                    v-if="shouldRenderGalleryImage(webinarIndex)"
-                    :src="img"
-                    :alt="webinar.title"
-                    loading="eager"
-                    decoding="async"
-                    data-fade-image
-                  />
-                </figure>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
     </div>
   </div>
 </section>

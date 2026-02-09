@@ -7,6 +7,7 @@
 
       const positioning = {
         title: '',
+        subtitle: '',
         pillars: [],
         quote: '',
         action: '',
@@ -27,6 +28,7 @@
       <header class="positioning__header" data-reveal data-reveal-delay="40">
         <p class="positioning__kicker">Практический подход</p>
         <h2 class="section-title positioning__title" id="positioning-title" data-reveal data-reveal-delay="100">{{ positioning.title }}</h2>
+        <p class="section-text positioning__subtitle" data-reveal data-reveal-delay="140">{{ positioning.subtitle }}</p>
       </header>
 
       <div class="positioning__grid">
@@ -45,10 +47,6 @@
       <div class="positioning__footer" data-reveal data-reveal-delay="300">
         <a class="btn btn--primary positioning__action" href="#pricing">{{ positioning.action }}</a>
       </div>
-
-      <blockquote class="positioning__quote" data-reveal data-reveal-delay="380">
-        <p>{{ positioning.quote }}</p>
-      </blockquote>
     </div>
   </div>
 </section>

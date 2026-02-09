@@ -109,29 +109,6 @@
   gap: 0.65rem;
 }
 
-.hero__aux {
-  margin: 0;
-  display: grid;
-  gap: 0.34rem;
-}
-
-.hero__aux-label {
-  margin: 0;
-  color: #ae4869;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: clamp(0.69rem, 2.2vw, 0.8rem);
-  font-weight: 700;
-}
-
-.hero__aux-title {
-  margin: 0;
-  color: #7a2e48;
-  font-size: clamp(0.95rem, 3vw, 1.12rem);
-  line-height: 1.24;
-  font-weight: 800;
-}
-
 .hero__btn {
   min-height: 2.95rem;
 }
@@ -196,11 +173,6 @@
     justify-content: center;
   }
 
-  .hero__aux {
-    justify-items: center;
-  }
-
-  .hero__aux-title,
   .hero__meta {
     font-size: 1.1rem;
   }
@@ -262,11 +234,6 @@
     padding: 0.56em 0.92em;
   }
 
-  .hero__aux-label {
-    font-size: 0.84rem;
-  }
-
-  .hero__aux-title,
   .hero__meta {
     font-size: 1.24rem;
   }
@@ -317,7 +284,6 @@
     font-size: 0.97rem;
   }
 
-  .hero__aux-title,
   .hero__meta {
     font-size: 1.16rem;
   }

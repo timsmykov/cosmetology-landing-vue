@@ -22,8 +22,7 @@
             oldPrice: plan && plan.oldPrice ? plan.oldPrice : '',
             newPrice: plan && plan.newPrice ? plan.newPrice : '',
             action: plan && plan.action ? plan.action : '',
-            paymentUrl: plan && typeof plan.paymentUrl === 'string' ? plan.paymentUrl.trim() : '',
-            recommended: Boolean(plan && plan.recommended)
+            paymentUrl: plan && typeof plan.paymentUrl === 'string' ? plan.paymentUrl.trim() : ''
           }))
         : [];
 
@@ -45,7 +44,6 @@
       <div class="pricing__grid">
         <article
           class="pricing__card"
-          :class="{ 'pricing__card--recommended': plan.recommended }"
           :id="plan.anchorId || null"
           v-for="(plan, index) in plans"
           :key="plan.name + index"
@@ -53,7 +51,6 @@
           :data-reveal-delay="220 + (index * 90)"
         >
           <div class="pricing__card-head">
-            <p v-if="plan.recommended" class="pricing__badge">Рекомендуем</p>
             <h3>{{ plan.name }}</h3>
           </div>
 

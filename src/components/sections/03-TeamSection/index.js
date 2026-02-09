@@ -344,7 +344,7 @@
               v-for="(point, pointIndex) in (Array.isArray(lead.points) ? lead.points : [])"
               :key="lead.name + point + pointIndex"
             >
-              {{ point }}
+              <span v-html="point"></span>
             </li>
           </ul>
         </article>
