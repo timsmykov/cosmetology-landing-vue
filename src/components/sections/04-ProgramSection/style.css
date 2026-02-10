@@ -336,6 +336,16 @@
   line-height: 1.48;
 }
 
+.program-card__purchase {
+  align-self: flex-start;
+  min-height: 2.48rem;
+  padding: 0.56rem 0.92rem;
+  border-radius: 0.72rem;
+  font-size: clamp(0.84rem, 2.3vw, 0.92rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 .program-card li::marker {
   color: #cf5e84;
 }
@@ -483,6 +493,13 @@
     gap: 0.52rem;
   }
 
+  .program-card__purchase {
+    min-height: 2.7rem;
+    padding: 0.64rem 1.05rem;
+    border-radius: 0.78rem;
+    font-size: 0.96rem;
+  }
+
   .program-card__gallery {
     gap: 0.64rem;
   }
@@ -601,6 +618,12 @@
     font-size: 1rem;
     line-height: 1.58;
     gap: 0.55rem;
+  }
+
+  .program-card__purchase {
+    min-height: 2.76rem;
+    padding: 0.66rem 1.08rem;
+    font-size: 0.94rem;
   }
 }
 

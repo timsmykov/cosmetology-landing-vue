@@ -8,6 +8,7 @@ import './components/sections/05-PricingSection/style.css';
 import './components/sections/06-FormatSection/style.css';
 import './components/sections/07-FaqSection/style.css';
 import './components/sections/09-SelfCheckSection/style.css';
+import './components/sections/09-FooterSection/style.css';
 import './components/sections/10-ProgramCtaSection/style.css';
 
 import './app/registry.js';
@@ -21,6 +22,7 @@ import './content/04-program.js';
 import './content/05-pricing.js';
 import './content/06-format.js';
 import './content/07-faq.js';
+import './content/09-footer.js';
 import './content/09-self-check.js';
 
 import './components/sections/01-HeroSection/index.js';
@@ -30,6 +32,7 @@ import './components/sections/04-ProgramSection/index.js';
 import './components/sections/05-PricingSection/index.js';
 import './components/sections/06-FormatSection/index.js';
 import './components/sections/07-FaqSection/index.js';
+import './components/sections/09-FooterSection/index.js';
 import './components/sections/09-SelfCheckSection/index.js';
 import './components/sections/10-ProgramCtaSection/index.js';
 

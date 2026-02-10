@@ -36,7 +36,7 @@
   <div class="container">
     <div class="pricing__surface" data-reveal="zoom">
       <header class="pricing__header" data-reveal data-reveal-delay="40">
-        <p class="pricing__kicker">Форматы участия</p>
+        <p class="pricing__kicker">Модель обучения</p>
         <h2 class="section-title pricing__title" id="pricing-title" data-reveal data-reveal-delay="100">{{ pricing.title }}</h2>
         <p class="section-text pricing__text" data-reveal data-reveal-delay="160">{{ pricing.text }}</p>
       </header>

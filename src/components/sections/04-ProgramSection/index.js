@@ -37,6 +37,9 @@
               title: webinar && webinar.title ? webinar.title : '',
               date: webinar && webinar.date ? webinar.date : '',
               text: webinar && webinar.text ? webinar.text : '',
+              purchaseLabel: webinar && webinar.purchaseLabel ? webinar.purchaseLabel : `Купить вебинар ${index + 1}`,
+              purchaseUrl:
+                webinar && typeof webinar.purchaseUrl === 'string' ? webinar.purchaseUrl.trim() : '',
               learn,
               previewImage: webinar && webinar.previewImage ? webinar.previewImage : normalizedImages[0] || '',
               images: normalizedImages
@@ -735,6 +738,14 @@
       getCardTitle(title) {
         const source = typeof title === 'string' ? title : '';
         return source.replace(/^Вебинар\s*\d+\s*[.:\-]?\s*/i, '').trim();
+      },
+      isPaymentUrlActive(url) {
+        if (typeof url !== 'string') {
+          return false;
+        }
+
+        const normalized = url.trim();
+        return Boolean(normalized) && normalized !== '#';
       }
     },
     template: `
@@ -824,6 +835,19 @@
                 <ul>
                   <li v-for="(item, itemIndex) in webinar.learn" :key="webinar.title + item + itemIndex">{{ item }}</li>
                 </ul>
+
+                <a
+                  v-if="isPaymentUrlActive(webinar.purchaseUrl)"
+                  class="btn btn--primary program-card__purchase"
+                  :href="webinar.purchaseUrl"
+                  :target="webinar.purchaseUrl.indexOf('http') === 0 ? '_blank' : null"
+                  :rel="webinar.purchaseUrl.indexOf('http') === 0 ? 'noopener noreferrer' : null"
+                >
+                  {{ webinar.purchaseLabel }}
+                </a>
+                <button v-else class="btn btn--primary program-card__purchase" type="button" disabled>
+                  {{ webinar.purchaseLabel }}
+                </button>
 
                 <div v-if="webinar.images.length" class="program-card__gallery">
                   <figure class="program-card__figure">

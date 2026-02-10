@@ -18,7 +18,8 @@
       TeamSection: components.TeamSection,
       PricingSection: components.PricingSection,
       FormatSection: components.FormatSection,
-      FaqSection: components.FaqSection
+      FaqSection: components.FaqSection,
+      FooterSection: components.FooterSection
     },
     mounted() {
       window.addEventListener('scroll', this.handleScroll, { passive: true });
@@ -68,6 +69,7 @@
   <PricingSection />
   <FormatSection />
   <FaqSection />
+  <FooterSection />
 
   <button
     class="scroll-top"
